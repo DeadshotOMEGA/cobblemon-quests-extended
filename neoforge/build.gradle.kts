@@ -122,14 +122,11 @@ modrinth {
     loaders.add("neoforge")
 
     // Dependencies (use Modrinth project slugs)
+    // Note: FTB mods are CurseForge-exclusive, not on Modrinth
     dependencies {
         // Required dependencies
         required.project("cobblemon")
-        required.project("ftb-quests")
-
-        // Optional dependencies for better integration
-        optional.project("ftb-teams")
-        optional.project("ftb-library")
+        // FTB Quests is required but not on Modrinth - users must install separately
     }
 
     // Changelog from file (GitHub Actions will set this)
