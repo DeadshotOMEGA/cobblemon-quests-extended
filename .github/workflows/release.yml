@@ -1,0 +1,135 @@
+name: Release to Modrinth
+
+on:
+  push:
+    tags:
+      - 'v*' # Triggers on tags like v1.2.0, v1.2.0-beta.1, v1.2.0-alpha.1
+
+permissions:
+  contents: write # Required for creating GitHub releases
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for changelog generation
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+
+      - name: Parse version and channel from tag
+        id: version
+        run: |
+          # Extract version from tag (strip 'v' prefix)
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+          # Determine release channel based on tag format
+          if [[ "$VERSION" =~ -alpha ]]; then
+            CHANNEL="alpha"
+          elif [[ "$VERSION" =~ -beta ]]; then
+            CHANNEL="beta"
+          else
+            CHANNEL="release"
+          fi
+          echo "channel=$CHANNEL" >> $GITHUB_OUTPUT
+
+          # Extract changelog for this version
+          if [ -f CHANGELOG.md ]; then
+            # Extract content between version headers
+            CHANGELOG=$(awk -v ver="$VERSION" '
+              /^## \[/{
+                if (found) exit;
+                if ($2 == "["ver"]") found=1;
+                next;
+              }
+              found {print}
+            ' CHANGELOG.md)
+
+            # If changelog is empty, provide default message
+            if [ -z "$CHANGELOG" ]; then
+              CHANGELOG="See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details."
+            fi
+
+            # Save to file for multiline support
+            echo "$CHANGELOG" > changelog.txt
+          else
+            echo "See commit history for changes." > changelog.txt
+          fi
+
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v2
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build --no-daemon
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          MODRINTH_PROJECT_ID: ${{ secrets.MODRINTH_PROJECT_ID }}
+          RELEASE_CHANNEL: ${{ steps.version.outputs.channel }}
+
+      - name: Publish to Modrinth
+        run: ./gradlew modrinth --no-daemon
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          MODRINTH_PROJECT_ID: ${{ secrets.MODRINTH_PROJECT_ID }}
+          RELEASE_CHANNEL: ${{ steps.version.outputs.channel }}
+
+      - name: Find built artifacts
+        id: artifacts
+        run: |
+          # Find the remapped jars (production artifacts, not dev jars)
+          FABRIC_JAR=$(find fabric/build/libs -name "*fabric-${{ steps.version.outputs.version }}.jar" -not -name "*dev*" | head -1)
+          NEOFORGE_JAR=$(find neoforge/build/libs -name "*neoforge-${{ steps.version.outputs.version }}.jar" -not -name "*dev*" | head -1)
+
+          echo "fabric_jar=$FABRIC_JAR" >> $GITHUB_OUTPUT
+          echo "neoforge_jar=$NEOFORGE_JAR" >> $GITHUB_OUTPUT
+
+          # Debug output
+          echo "Fabric JAR: $FABRIC_JAR"
+          echo "NeoForge JAR: $NEOFORGE_JAR"
+
+          # Verify files exist
+          if [ ! -f "$FABRIC_JAR" ]; then
+            echo "ERROR: Fabric JAR not found"
+            ls -R fabric/build/libs/
+            exit 1
+          fi
+          if [ ! -f "$NEOFORGE_JAR" ]; then
+            echo "ERROR: NeoForge JAR not found"
+            ls -R neoforge/build/libs/
+            exit 1
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ steps.version.outputs.version }}
+          body_path: changelog.txt
+          draft: false
+          prerelease: ${{ steps.version.outputs.channel != 'release' }}
+          files: |
+            ${{ steps.artifacts.outputs.fabric_jar }}
+            ${{ steps.artifacts.outputs.neoforge_jar }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-artifacts-${{ steps.version.outputs.version }}
+          path: |
+            fabric/build/libs/*.jar
+            neoforge/build/libs/*.jar
+          retention-days: 30

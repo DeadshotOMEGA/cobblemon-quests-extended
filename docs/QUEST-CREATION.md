@@ -1,5 +1,28 @@
 # Documentation for quest creators
 
+## Using the Action Picker (v1.2.0+)
+
+When creating or editing a Cobblemon Task in the FTB Quests editor, clicking on the **Actions** field opens the new Action Picker screen:
+
+### Features
+- **Categorized Actions**: Actions are organized into collapsible categories for easy navigation:
+  - **Obtaining Pokémon** (green): catch, obtain, trade_for, revive_fossil, select_starter, reel
+  - **Battle** (red): defeat, defeat_player, defeat_npc, kill, faint_pokemon, send_out
+  - **Evolution** (purple): evolve, evolve_into, level_up, level_up_to
+  - **Trading** (orange): trade_away, trade_for
+  - **Pokédex** (blue): scan, register, have_registered
+  - **Battle Gimmicks** (pink): mega_evolve, terastallize, use_z_move, dynamax, gigantamax, ultra_burst, change_form
+  - **Other** (gray): release, throw_ball, give_held_item, heal, hatch_egg
+
+- **Rich Tooltips**: Hover over any action to see:
+  - Action name and category
+  - Description of what triggers the action
+  - Usage example
+  - Whether the action requires a Pokémon parameter
+  - The action's internal ID
+
+- **Click to Expand/Collapse**: Click category headers to show/hide actions in that category
+
 ## Actions
 
 ### Core Actions

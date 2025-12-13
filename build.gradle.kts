@@ -5,6 +5,7 @@ plugins {
 
     id("dev.architectury.loom") version ("1.11-SNAPSHOT") apply false
     id("architectury-plugin") version ("3.4-SNAPSHOT") apply false
+    id("com.modrinth.minotaur") version ("2.+") apply false
 }
 
 group = "${property("maven_group")}"

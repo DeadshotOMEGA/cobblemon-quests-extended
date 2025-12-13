@@ -12,9 +12,11 @@ import com.cobblemon.mod.common.item.components.PokemonItemComponent;
 import com.cobblemon.mod.common.pokemon.Nature;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.cobblemon.mod.common.pokemon.Species;
+import cobblemonquestsextended.cobblemon_quests_extended.client.config.ConfigActionType;
 import dev.ftb.mods.ftblibrary.config.ConfigGroup;
 import dev.ftb.mods.ftblibrary.config.EnumConfig;
 import dev.ftb.mods.ftblibrary.config.NameMap;
+import dev.ftb.mods.ftblibrary.config.StringConfig;
 import dev.ftb.mods.ftblibrary.icon.Icon;
 import dev.ftb.mods.ftblibrary.icon.ItemIcon;
 import dev.ftb.mods.ftbquests.quest.Quest;
@@ -235,7 +237,8 @@ public class CobblemonTask extends Task {
         // Asserts that the client is in a world, something that always should be true when the config is opened.
         assert Minecraft.getInstance().level != null;
         RegistryAccess registryManager = Minecraft.getInstance().level.registryAccess();
-        addConfigList(config, "actions", actions, actionList, null, null);
+        // Use ConfigActionType for rich action selection UI with categories and tooltips
+        config.addList("actions", actions, new ConfigActionType(), "catch").setNameKey(MOD_ID + ".task.actions");
         Function<String, String> pokemonNameProcessor = (name) -> name.replace(":", ".species.") + ".name";
         List<String> pokemonList = PokemonSpecies.getSpecies().stream().map(species -> species.resourceIdentifier.toString())
                 .sorted().collect(Collectors.toCollection(() -> new ArrayList<>(PokemonSpecies.getSpecies().size() + 1)));
@@ -279,8 +282,10 @@ public class CobblemonTask extends Task {
     }
 
     private void addConfigList(ConfigGroup config, String listName, List<String> listData, List<String> optionsList, Function<ResourceLocation, Icon> iconProcessor, Function<String, String> nameProcessor) {
-        NameMap<String> nameMap = NameMap.of(optionsList.getFirst(), optionsList).id(s -> s).name(s -> Component.translatable(nameProcessor == null ? MOD_ID + "." + listName + "." + s : nameProcessor.apply(s))).icon(s -> iconProcessor == null ? pokeBallIcon : iconProcessor.apply(ResourceLocation.parse(s))).create();
-        config.addList(listName, listData, new EnumConfig<>(nameMap), optionsList.getLast()).setNameKey(MOD_ID + ".task." + listName);
+        // Use StringConfig instead of EnumConfig - EnumConfig doesn't work with addList (upstream FTB Library bug)
+        // This means no dropdown selection, but adding items actually works
+        List<String> validOptions = optionsList.stream().filter(s -> !s.isEmpty()).collect(Collectors.toList());
+        config.addList(listName, listData, new StringConfig(), validOptions.getFirst()).setNameKey(MOD_ID + ".task." + listName);
     }
 
     @Override

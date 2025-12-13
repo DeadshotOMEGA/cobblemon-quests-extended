@@ -2,6 +2,7 @@ plugins {
     id("dev.architectury.loom")
     id("architectury-plugin")
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("com.modrinth.minotaur")
 }
 
 architectury {
@@ -97,4 +98,43 @@ tasks {
         archiveBaseName.set("${rootProject.property("archives_base_name")}-${project.name}")
         archiveVersion.set("${rootProject.version}")
     }
+}
+
+// Modrinth publishing configuration
+modrinth {
+    token.set(System.getenv("MODRINTH_TOKEN") ?: "")
+    projectId.set(System.getenv("MODRINTH_PROJECT_ID") ?: "")
+
+    // Version configuration
+    versionNumber.set("${project.version}")
+    versionName.set("[NeoForge ${project.property("minecraft_version")}] ${project.version}")
+
+    // Release channel from environment or default to release
+    versionType.set(System.getenv("RELEASE_CHANNEL") ?: "release")
+
+    // Upload the remapped jar (production artifact)
+    uploadFile.set(tasks.remapJar.get())
+
+    // Game versions - supports multiple versions if needed
+    gameVersions.add("${project.property("minecraft_version")}")
+
+    // Loaders
+    loaders.add("neoforge")
+
+    // Dependencies
+    dependencies {
+        // Required dependencies
+        required.project("cobblemon")
+        required.project("ftb-quests-neoforge")
+
+        // Optional dependencies for better integration
+        optional.project("ftb-teams-neoforge")
+        optional.project("ftb-library-neoforge")
+    }
+
+    // Changelog from file (GitHub Actions will set this)
+    changelog.set(project.findProperty("modrinth.changelog")?.toString() ?: "")
+
+    // Sync with CurseForge if needed in the future
+    syncBodyFrom.set(rootProject.file("README.md").readText())
 }
