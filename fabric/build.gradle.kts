@@ -112,15 +112,15 @@ modrinth {
     loaders.add("fabric")
     loaders.add("quilt") // Quilt is compatible with Fabric mods
 
-    // Dependencies
+    // Dependencies (use Modrinth project slugs)
     dependencies {
         // Required dependencies
         required.project("cobblemon")
-        required.project("ftb-quests-fabric")
+        required.project("ftb-quests")
 
         // Optional dependencies for better integration
-        optional.project("ftb-teams-fabric")
-        optional.project("ftb-library-fabric")
+        optional.project("ftb-teams")
+        optional.project("ftb-library")
     }
 
     // Changelog from file (GitHub Actions will set this)

@@ -121,15 +121,15 @@ modrinth {
     // Loaders
     loaders.add("neoforge")
 
-    // Dependencies
+    // Dependencies (use Modrinth project slugs)
     dependencies {
         // Required dependencies
         required.project("cobblemon")
-        required.project("ftb-quests-neoforge")
+        required.project("ftb-quests")
 
         // Optional dependencies for better integration
-        optional.project("ftb-teams-neoforge")
-        optional.project("ftb-library-neoforge")
+        optional.project("ftb-teams")
+        optional.project("ftb-library")
     }
 
     // Changelog from file (GitHub Actions will set this)
