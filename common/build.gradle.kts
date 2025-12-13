@@ -27,5 +27,5 @@ dependencies {
 
     // Optional integrations (soft dependencies)
     // https://www.curseforge.com/minecraft/mc-mods/cobblemon-mega-showdown/files/
-    modCompileOnly("curse.maven:cobblemon-mega-showdown-1189523:6258127")
+    modCompileOnly("curse.maven:cobblemon-mega-showdown-1189523:7274148")
 }
