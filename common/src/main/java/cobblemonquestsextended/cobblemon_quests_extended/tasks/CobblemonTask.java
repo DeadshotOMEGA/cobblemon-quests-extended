@@ -5,20 +5,28 @@ import com.cobblemon.mod.common.api.pokeball.PokeBalls;
 import com.cobblemon.mod.common.api.pokedex.PokedexEntryProgress;
 import com.cobblemon.mod.common.api.pokedex.PokedexManager;
 import com.cobblemon.mod.common.api.pokedex.SpeciesDexRecord;
-import com.cobblemon.mod.common.api.pokemon.Natures;
 import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
 import com.cobblemon.mod.common.api.types.ElementalType;
 import com.cobblemon.mod.common.item.components.PokemonItemComponent;
-import com.cobblemon.mod.common.pokemon.Nature;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.cobblemon.mod.common.pokemon.Species;
 import cobblemonquestsextended.cobblemon_quests_extended.client.config.ConfigActionType;
+import cobblemonquestsextended.cobblemon_quests_extended.client.config.ConfigBiomeType;
+import cobblemonquestsextended.cobblemon_quests_extended.client.config.ConfigDimensionType;
+import cobblemonquestsextended.cobblemon_quests_extended.client.config.ConfigDynamaxType;
+import cobblemonquestsextended.cobblemon_quests_extended.client.config.ConfigFormType;
+import cobblemonquestsextended.cobblemon_quests_extended.client.config.ConfigGenderType;
+import cobblemonquestsextended.cobblemon_quests_extended.client.config.ConfigMegaFormType;
+import cobblemonquestsextended.cobblemon_quests_extended.client.config.ConfigNatureType;
+import cobblemonquestsextended.cobblemon_quests_extended.client.config.ConfigPokeBallType;
+import cobblemonquestsextended.cobblemon_quests_extended.client.config.ConfigPokemonType;
+import cobblemonquestsextended.cobblemon_quests_extended.client.config.ConfigRegionType;
+import cobblemonquestsextended.cobblemon_quests_extended.client.config.ConfigTeraType;
+import cobblemonquestsextended.cobblemon_quests_extended.client.config.ConfigTypeSelector;
+import cobblemonquestsextended.cobblemon_quests_extended.client.config.ConfigZCrystalType;
 import dev.architectury.networking.NetworkManager;
 import dev.ftb.mods.ftblibrary.config.ConfigGroup;
-import dev.ftb.mods.ftblibrary.config.EnumConfig;
 import dev.ftb.mods.ftblibrary.config.NameMap;
-import dev.ftb.mods.ftblibrary.config.StringConfig;
-import dev.ftb.mods.ftblibrary.config.ui.EditConfigScreen;
 import dev.ftb.mods.ftblibrary.icon.Icon;
 import dev.ftb.mods.ftblibrary.icon.ItemIcon;
 import dev.ftb.mods.ftbquests.net.EditObjectMessage;
@@ -28,11 +36,8 @@ import dev.ftb.mods.ftbquests.quest.task.Task;
 import dev.ftb.mods.ftbquests.quest.task.TaskType;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -45,7 +50,6 @@ import org.joml.Vector4f;
 import cobblemonquestsextended.cobblemon_quests_extended.config.CobblemonQuestsConfig;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static cobblemonquestsextended.cobblemon_quests_extended.CobblemonQuests.MOD_ID;
@@ -288,16 +292,6 @@ public class CobblemonTask extends Task {
     public void fillConfigGroup(ConfigGroup config) {
         super.fillConfigGroup(config);
 
-        // Assert that the client is in a world (should always be true when config opens)
-        assert Minecraft.getInstance().level != null;
-        RegistryAccess registryManager = Minecraft.getInstance().level.registryAccess();
-
-        // Prepare common processor functions
-        Function<String, String> pokemonNameProcessor = (name) ->
-            name.replace(":", ".species.") + ".name";
-        Function<String, String> pokemonTypeNameProcessor = (name) ->
-            "cobblemon.type." + name;
-
         // ===== SECTION 1: ACTION SELECTION =====
         // Always shown - user must select at least one action
         config.addList("actions", actions, new ConfigActionType(), "catch")
@@ -305,7 +299,7 @@ public class CobblemonTask extends Task {
 
         // ===== SECTION 2: BASIC CONDITIONS =====
         // These fields are always shown (quantity, shiny, species, type, nature, region)
-        addBasicConditionFields(config, registryManager, pokemonNameProcessor, pokemonTypeNameProcessor);
+        addBasicConditionFields(config);
 
         // ===== SECTION 3: CONDITIONAL SECTIONS BASED ON SELECTED ACTIONS =====
 
@@ -321,7 +315,7 @@ public class CobblemonTask extends Task {
 
         // Time and location - only for catch/battle actions
         if (shouldShowTimeLocationFields()) {
-            addTimeLocationFields(config, registryManager);
+            addTimeLocationFields(config);
         }
 
         // Form/variant filters - for evolution and form-related actions
@@ -336,7 +330,7 @@ public class CobblemonTask extends Task {
 
         // ===== SECTION 4: GIMMICK-SPECIFIC FIELDS =====
         // These only appear when specific gimmick actions are selected
-        addGimmickFields(config, pokemonTypeNameProcessor);
+        addGimmickFields(config);
     }
 
     // ===== VISIBILITY HELPER METHODS =====
@@ -398,31 +392,28 @@ public class CobblemonTask extends Task {
      * Adds basic condition fields that are always shown regardless of action.
      * Includes: amount, shiny, pokemons, pokemon_types, natures, regions
      */
-    private void addBasicConditionFields(ConfigGroup config, RegistryAccess registryManager,
-            Function<String, String> pokemonNameProcessor,
-            Function<String, String> pokemonTypeNameProcessor) {
-
+    private void addBasicConditionFields(ConfigGroup config) {
         config.addLong("amount", amount, v -> amount = v, 1L, 1L, Long.MAX_VALUE)
             .setNameKey(MOD_ID + ".task.amount");
 
         config.addBool("shiny", shiny, v -> shiny = v, false)
             .setNameKey(MOD_ID + ".task.shiny");
 
-        List<String> pokemonList = PokemonSpecies.getSpecies().stream()
-            .map(species -> species.resourceIdentifier.toString())
-            .sorted()
-            .collect(Collectors.toCollection(() -> new ArrayList<>(PokemonSpecies.getSpecies().size() + 1)));
-        pokemonList.add("cobblemon_quests"); // Bypass last-item selection issue
-        addConfigList(config, "pokemons", pokemons, pokemonList, this::getPokemonIcon, pokemonNameProcessor);
+        // Pokemon list with ConfigPokemonType for species selection
+        config.addList("pokemons", pokemons, new ConfigPokemonType(), "")
+            .setNameKey(MOD_ID + ".task.pokemons");
 
-        addConfigList(config, "pokemon_types", pokemonTypes, pokemonTypeList, null, pokemonTypeNameProcessor);
+        // Pokemon types with ConfigTypeSelector for type filtering
+        config.addList("pokemon_types", pokemonTypes, new ConfigTypeSelector(), "")
+            .setNameKey(MOD_ID + ".task.pokemon_types");
 
-        List<String> natureList = Natures.all().stream()
-            .map(Nature::getDisplayName)
-            .toList();
-        addConfigList(config, "natures", natures, natureList, null, s -> s);
+        // Natures with ConfigNatureType
+        config.addList("natures", natures, new ConfigNatureType(), "")
+            .setNameKey(MOD_ID + ".task.natures");
 
-        addConfigList(config, "regions", regions, regionList, null, null);
+        // Regions with ConfigRegionType
+        config.addList("regions", regions, new ConfigRegionType(), "")
+            .setNameKey(MOD_ID + ".task.regions");
     }
 
     /**
@@ -454,37 +445,24 @@ public class CobblemonTask extends Task {
      * Adds time and location restriction fields.
      * Only shown when catch or battle actions are selected.
      */
-    private void addTimeLocationFields(ConfigGroup config, RegistryAccess registryManager) {
+    private void addTimeLocationFields(ConfigGroup config) {
         config.addLong("time_min", timeMin, v -> timeMin = v, 0L, 0L, 24000L)
             .setNameKey(MOD_ID + ".task.time_min");
 
         config.addLong("time_max", timeMax, v -> timeMax = v, 24000L, 0L, 24000L)
             .setNameKey(MOD_ID + ".task.time_max");
 
-        Function<String, String> biomeAndDimensionNameProcessor = (name) ->
-            "(" + name.replace("_", " ").replace(":", ") ");
+        // Biomes with ConfigBiomeType
+        config.addList("biomes", biomes, new ConfigBiomeType(), "")
+            .setNameKey(MOD_ID + ".task.biomes");
 
-        List<String> biomeList = registryManager.registryOrThrow(Registries.BIOME)
-            .entrySet().stream()
-            .map(entry -> entry.getKey().location().toString())
-            .toList();
-        addConfigList(config, "biomes", biomes, biomeList, null, biomeAndDimensionNameProcessor);
+        // Dimensions with ConfigDimensionType
+        config.addList("dimensions", dimensions, new ConfigDimensionType(), "")
+            .setNameKey(MOD_ID + ".task.dimensions");
 
-        ArrayList<String> dimensionList = new ArrayList<>(
-            registryManager.registryOrThrow(Registries.DIMENSION_TYPE)
-                .entrySet().stream()
-                .map(entry -> entry.getKey().location().toString())
-                .toList());
-        dimensionList.remove("minecraft:overworld_caves");
-        addConfigList(config, "dimensions", dimensions, dimensionList, null, biomeAndDimensionNameProcessor);
-
-        Function<String, String> pokeBallNameProcessor = (name) -> "item." + name.replace(":", ".");
-        List<String> pokeBallList = PokeBalls.all().stream()
-            .map(pokeBall -> pokeBall.getName().toString())
-            .sorted()
-            .collect(Collectors.toCollection(() -> new ArrayList<>(PokeBalls.all().size() + 1)));
-        pokeBallList.add("cobblemon_quests");
-        addConfigList(config, "pokeballs", pokeBallsUsed, pokeBallList, this::getIconFromIdentifier, pokeBallNameProcessor);
+        // PokeBalls with ConfigPokeBallType
+        config.addList("pokeballs", pokeBallsUsed, new ConfigPokeBallType(), "")
+            .setNameKey(MOD_ID + ".task.pokeballs");
     }
 
     /**
@@ -492,44 +470,49 @@ public class CobblemonTask extends Task {
      * Shown when evolution or form-related actions are selected.
      */
     private void addFormFields(ConfigGroup config) {
-        addConfigList(config, "forms", forms, formList, null, null);
+        // Forms with ConfigFormType
+        config.addList("forms", forms, new ConfigFormType(), "")
+            .setNameKey(MOD_ID + ".task.forms");
     }
 
     /**
      * Adds gender filtering fields.
      */
     private void addGenderFields(ConfigGroup config) {
-        addConfigList(config, "genders", genders, genderList, null, null);
+        // Genders with ConfigGenderType
+        config.addList("genders", genders, new ConfigGenderType(), "")
+            .setNameKey(MOD_ID + ".task.genders");
     }
 
     /**
      * Adds gimmick-specific condition fields.
      * Mega Evolution, Terastallization, Z-Moves, Dynamax, etc.
      */
-    private void addGimmickFields(ConfigGroup config, Function<String, String> pokemonTypeNameProcessor) {
+    private void addGimmickFields(ConfigGroup config) {
         if (shouldShowGimmickFields("mega_evolve")) {
-            addConfigList(config, "mega_forms", megaForms, megaFormList, null, null);
+            // Mega forms with ConfigMegaFormType
+            config.addList("mega_forms", megaForms, new ConfigMegaFormType(), "")
+                .setNameKey(MOD_ID + ".task.mega_forms");
         }
 
         if (shouldShowGimmickFields("terastallize")) {
-            addConfigList(config, "tera_types", teraTypes, teraTypeList, null, pokemonTypeNameProcessor);
+            // Tera types with ConfigTeraType
+            config.addList("tera_types", teraTypes, new ConfigTeraType(), "")
+                .setNameKey(MOD_ID + ".task.tera_types");
         }
 
         if (shouldShowGimmickFields("use_z_move")) {
-            addConfigList(config, "z_crystals", zCrystals, zCrystalList, null, null);
+            // Z-Crystals with ConfigZCrystalType
+            config.addList("z_crystals", zCrystals, new ConfigZCrystalType(), "")
+                .setNameKey(MOD_ID + ".task.z_crystals");
         }
 
         if (shouldShowGimmickFields("dynamax") || shouldShowGimmickFields("gigantamax")
                 || shouldShowGimmickFields("ultra_burst")) {
-            addConfigList(config, "dynamax_types", dynamaxTypes, dynamaxTypeList, null, null);
+            // Dynamax types with ConfigDynamaxType
+            config.addList("dynamax_types", dynamaxTypes, new ConfigDynamaxType(), "")
+                .setNameKey(MOD_ID + ".task.dynamax_types");
         }
-    }
-
-    private void addConfigList(ConfigGroup config, String listName, List<String> listData, List<String> optionsList, Function<ResourceLocation, Icon> iconProcessor, Function<String, String> nameProcessor) {
-        // Use StringConfig instead of EnumConfig - EnumConfig doesn't work with addList (upstream FTB Library bug)
-        // This means no dropdown selection, but adding items actually works
-        List<String> validOptions = optionsList.stream().filter(s -> !s.isEmpty()).collect(Collectors.toList());
-        config.addList(listName, listData, new StringConfig(), validOptions.getFirst()).setNameKey(MOD_ID + ".task." + listName);
     }
 
     @Override
