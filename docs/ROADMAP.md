@@ -151,12 +151,17 @@ public class FieldVisibilityRules {
 **Risk:** MODERATE
 **Target Version:** 1.4.0
 
+### Reference Documents
+
+- **[CONDITIONAL_FIELD_ANALYSIS.md](CONDITIONAL_FIELD_ANALYSIS.md)** - Comprehensive analysis of all 19 conditional fields, action-by-action visibility matrix for 28 actions, and proposed implementation
+
 ### Problems
 
 1. **Inconsistent UI**: Actions have a beautiful categorized picker with tooltips, but all other list fields (Pokemon, Types, Biomes, etc.) still use basic FTB Library list editors
 2. **Poor organization**: The conditionals screen shows all fields in a flat list without logical grouping
 3. **No tooltips**: Condition fields lack helpful descriptions explaining what they do
 4. **Tight coupling**: Quest data is coupled to FTB Library's ConfigGroup, making validation and testing difficult
+5. **Incorrect field visibility**: Many fields shown when they shouldn't be (see analysis doc for full matrix)
 
 ### Deliverables
 
