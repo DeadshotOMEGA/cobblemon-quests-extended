@@ -1,0 +1,554 @@
+{
+    default_hide_dependency_lines: false
+    default_quest_shape: ""
+    filename: "extended_features_test"
+    group: ""
+    icon: "cobblemon:poke_ball"
+    id: "EXTENDED_FEATURES_TEST"
+    order_index: 0
+    quest_links: [ ]
+    quests: [
+        {
+            description: ["Test quest for Mega Evolution action"]
+            icon: "cobblemon:pokemon_model"
+            id: "mega_evolution_test"
+            tasks: [
+                {
+                    action: "mega_evolve"
+                    amount: 1L
+                    biome: ""
+                    dimension: ""
+                    form: ""
+                    gender: ""
+                    id: "mega_evolution_task"
+                    mega_form: "mega"
+                    min_level: 0
+                    max_level: 0
+                    poke_ball_used: ""
+                    pokemon: ""
+                    pokemon_type: ""
+                    region: ""
+                    shiny: false
+                    tera_type: ""
+                    z_crystal: ""
+                    dynamax_type: ""
+                    time_max: 24000L
+                    time_min: 0L
+                    type: "cobblemon_tasks:cobblemon_task"
+                }
+            ]
+            title: "Mega Evolution Test"
+            x: 0.0d
+            y: 0.0d
+        }
+        {
+            dependencies: ["mega_evolution_test"]
+            description: ["Test quest for Mega Charizard X specifically"]
+            icon: "cobblemon:pokemon_model"
+            id: "mega_charizard_x_test"
+            tasks: [
+                {
+                    action: "mega_evolve"
+                    amount: 1L
+                    biome: ""
+                    dimension: ""
+                    form: ""
+                    gender: ""
+                    id: "mega_charizard_x_task"
+                    mega_form: "mega-x"
+                    min_level: 0
+                    max_level: 0
+                    poke_ball_used: ""
+                    pokemon: "charizard"
+                    pokemon_type: ""
+                    region: ""
+                    shiny: false
+                    tera_type: ""
+                    z_crystal: ""
+                    dynamax_type: ""
+                    time_max: 24000L
+                    time_min: 0L
+                    type: "cobblemon_tasks:cobblemon_task"
+                }
+            ]
+            title: "Mega Charizard X Test"
+            x: 1.5d
+            y: 0.0d
+        }
+        {
+            description: ["Test quest for Terastallization action"]
+            icon: "cobblemon:pokemon_model"
+            id: "terastallization_test"
+            tasks: [
+                {
+                    action: "terastallize"
+                    amount: 1L
+                    biome: ""
+                    dimension: ""
+                    form: ""
+                    gender: ""
+                    id: "terastallization_task"
+                    mega_form: ""
+                    min_level: 0
+                    max_level: 0
+                    poke_ball_used: ""
+                    pokemon: ""
+                    pokemon_type: ""
+                    region: ""
+                    shiny: false
+                    tera_type: ""
+                    z_crystal: ""
+                    dynamax_type: ""
+                    time_max: 24000L
+                    time_min: 0L
+                    type: "cobblemon_tasks:cobblemon_task"
+                }
+            ]
+            title: "Terastallization Test"
+            x: 0.0d
+            y: 1.5d
+        }
+        {
+            dependencies: ["terastallization_test"]
+            description: ["Test quest for Fire Tera type specifically"]
+            icon: "cobblemon:pokemon_model"
+            id: "fire_tera_test"
+            tasks: [
+                {
+                    action: "terastallize"
+                    amount: 3L
+                    biome: ""
+                    dimension: ""
+                    form: ""
+                    gender: ""
+                    id: "fire_tera_task"
+                    mega_form: ""
+                    min_level: 0
+                    max_level: 0
+                    poke_ball_used: ""
+                    pokemon: ""
+                    pokemon_type: ""
+                    region: ""
+                    shiny: false
+                    tera_type: "fire"
+                    z_crystal: ""
+                    dynamax_type: ""
+                    time_max: 24000L
+                    time_min: 0L
+                    type: "cobblemon_tasks:cobblemon_task"
+                }
+            ]
+            title: "Fire Tera Type Test"
+            x: 1.5d
+            y: 1.5d
+        }
+        {
+            dependencies: ["terastallization_test"]
+            description: ["Test quest for Stellar Tera type"]
+            icon: "cobblemon:pokemon_model"
+            id: "stellar_tera_test"
+            tasks: [
+                {
+                    action: "terastallize"
+                    amount: 1L
+                    biome: ""
+                    dimension: ""
+                    form: ""
+                    gender: ""
+                    id: "stellar_tera_task"
+                    mega_form: ""
+                    min_level: 0
+                    max_level: 0
+                    poke_ball_used: ""
+                    pokemon: ""
+                    pokemon_type: ""
+                    region: ""
+                    shiny: false
+                    tera_type: "stellar"
+                    z_crystal: ""
+                    dynamax_type: ""
+                    time_max: 24000L
+                    time_min: 0L
+                    type: "cobblemon_tasks:cobblemon_task"
+                }
+            ]
+            title: "Stellar Tera Test"
+            x: 3.0d
+            y: 1.5d
+        }
+        {
+            description: ["Test quest for Z-Move action"]
+            icon: "cobblemon:pokemon_model"
+            id: "z_move_test"
+            tasks: [
+                {
+                    action: "use_z_move"
+                    amount: 1L
+                    biome: ""
+                    dimension: ""
+                    form: ""
+                    gender: ""
+                    id: "z_move_task"
+                    mega_form: ""
+                    min_level: 0
+                    max_level: 0
+                    poke_ball_used: ""
+                    pokemon: ""
+                    pokemon_type: ""
+                    region: ""
+                    shiny: false
+                    tera_type: ""
+                    z_crystal: ""
+                    dynamax_type: ""
+                    time_max: 24000L
+                    time_min: 0L
+                    type: "cobblemon_tasks:cobblemon_task"
+                }
+            ]
+            title: "Z-Move Test"
+            x: 0.0d
+            y: 3.0d
+        }
+        {
+            dependencies: ["z_move_test"]
+            description: ["Test quest for specific Z-Crystal"]
+            icon: "cobblemon:pokemon_model"
+            id: "pikashunium_z_test"
+            tasks: [
+                {
+                    action: "use_z_move"
+                    amount: 1L
+                    biome: ""
+                    dimension: ""
+                    form: "partner-cap"
+                    gender: ""
+                    id: "pikashunium_z_task"
+                    mega_form: ""
+                    min_level: 0
+                    max_level: 0
+                    poke_ball_used: ""
+                    pokemon: "pikachu"
+                    pokemon_type: ""
+                    region: ""
+                    shiny: false
+                    tera_type: ""
+                    z_crystal: "pikashunium-z"
+                    dynamax_type: ""
+                    time_max: 24000L
+                    time_min: 0L
+                    type: "cobblemon_tasks:cobblemon_task"
+                }
+            ]
+            title: "10,000,000 Volt Thunderbolt Test"
+            x: 1.5d
+            y: 3.0d
+        }
+        {
+            description: ["Test quest for form change action"]
+            icon: "cobblemon:pokemon_model"
+            id: "form_change_test"
+            tasks: [
+                {
+                    action: "change_form"
+                    amount: 1L
+                    biome: ""
+                    dimension: ""
+                    form: ""
+                    gender: ""
+                    id: "form_change_task"
+                    mega_form: ""
+                    min_level: 0
+                    max_level: 0
+                    poke_ball_used: ""
+                    pokemon: ""
+                    pokemon_type: ""
+                    region: ""
+                    shiny: false
+                    tera_type: ""
+                    z_crystal: ""
+                    dynamax_type: ""
+                    time_max: 24000L
+                    time_min: 0L
+                    type: "cobblemon_tasks:cobblemon_task"
+                }
+            ]
+            title: "Form Change Test"
+            x: 0.0d
+            y: 4.5d
+        }
+        {
+            description: ["Test quest for faint pokemon action"]
+            icon: "cobblemon:pokemon_model"
+            id: "faint_pokemon_test"
+            tasks: [
+                {
+                    action: "faint_pokemon"
+                    amount: 5L
+                    biome: ""
+                    dimension: ""
+                    form: ""
+                    gender: ""
+                    id: "faint_pokemon_task"
+                    mega_form: ""
+                    min_level: 0
+                    max_level: 0
+                    poke_ball_used: ""
+                    pokemon: ""
+                    pokemon_type: ""
+                    region: ""
+                    shiny: false
+                    tera_type: ""
+                    z_crystal: ""
+                    dynamax_type: ""
+                    time_max: 24000L
+                    time_min: 0L
+                    type: "cobblemon_tasks:cobblemon_task"
+                }
+            ]
+            title: "Faint Pokemon Test"
+            x: 1.5d
+            y: 4.5d
+        }
+        {
+            description: ["Test quest for send out action"]
+            icon: "cobblemon:pokemon_model"
+            id: "send_out_test"
+            tasks: [
+                {
+                    action: "send_out"
+                    amount: 10L
+                    biome: ""
+                    dimension: ""
+                    form: ""
+                    gender: ""
+                    id: "send_out_task"
+                    mega_form: ""
+                    min_level: 0
+                    max_level: 0
+                    poke_ball_used: ""
+                    pokemon: ""
+                    pokemon_type: ""
+                    region: ""
+                    shiny: false
+                    tera_type: ""
+                    z_crystal: ""
+                    dynamax_type: ""
+                    time_max: 24000L
+                    time_min: 0L
+                    type: "cobblemon_tasks:cobblemon_task"
+                }
+            ]
+            title: "Send Out Test"
+            x: 3.0d
+            y: 4.5d
+        }
+        {
+            description: ["Test quest for egg hatching action"]
+            icon: "cobblemon:pokemon_model"
+            id: "hatch_egg_test"
+            tasks: [
+                {
+                    action: "hatch_egg"
+                    amount: 1L
+                    biome: ""
+                    dimension: ""
+                    form: ""
+                    gender: ""
+                    id: "hatch_egg_task"
+                    mega_form: ""
+                    min_level: 0
+                    max_level: 0
+                    poke_ball_used: ""
+                    pokemon: ""
+                    pokemon_type: ""
+                    region: ""
+                    shiny: false
+                    tera_type: ""
+                    z_crystal: ""
+                    dynamax_type: ""
+                    time_max: 24000L
+                    time_min: 0L
+                    type: "cobblemon_tasks:cobblemon_task"
+                }
+            ]
+            title: "Hatch Egg Test"
+            x: 0.0d
+            y: 6.0d
+        }
+        {
+            dependencies: ["hatch_egg_test"]
+            description: ["Test quest for hatching shiny pokemon"]
+            icon: "cobblemon:pokemon_model"
+            id: "shiny_hatch_test"
+            tasks: [
+                {
+                    action: "hatch_egg"
+                    amount: 1L
+                    biome: ""
+                    dimension: ""
+                    form: ""
+                    gender: ""
+                    id: "shiny_hatch_task"
+                    mega_form: ""
+                    min_level: 0
+                    max_level: 0
+                    poke_ball_used: ""
+                    pokemon: ""
+                    pokemon_type: ""
+                    region: ""
+                    shiny: true
+                    tera_type: ""
+                    z_crystal: ""
+                    dynamax_type: ""
+                    time_max: 24000L
+                    time_min: 0L
+                    type: "cobblemon_tasks:cobblemon_task"
+                }
+            ]
+            title: "Shiny Hatch Test"
+            x: 1.5d
+            y: 6.0d
+        }
+        {
+            description: ["Test quest for Dynamax action (requires Mega Showdown)"]
+            icon: "cobblemon:pokemon_model"
+            id: "dynamax_test"
+            tasks: [
+                {
+                    action: "dynamax"
+                    amount: 1L
+                    biome: ""
+                    dimension: ""
+                    form: ""
+                    gender: ""
+                    id: "dynamax_task"
+                    mega_form: ""
+                    min_level: 0
+                    max_level: 0
+                    poke_ball_used: ""
+                    pokemon: ""
+                    pokemon_type: ""
+                    region: ""
+                    shiny: false
+                    tera_type: ""
+                    z_crystal: ""
+                    dynamax_type: "dynamax"
+                    time_max: 24000L
+                    time_min: 0L
+                    type: "cobblemon_tasks:cobblemon_task"
+                }
+            ]
+            title: "Dynamax Test (Mega Showdown)"
+            x: 0.0d
+            y: 7.5d
+        }
+        {
+            dependencies: ["dynamax_test"]
+            description: ["Test quest for Gigantamax action (requires Mega Showdown)"]
+            icon: "cobblemon:pokemon_model"
+            id: "gigantamax_test"
+            tasks: [
+                {
+                    action: "gigantamax"
+                    amount: 1L
+                    biome: ""
+                    dimension: ""
+                    form: ""
+                    gender: ""
+                    id: "gigantamax_task"
+                    mega_form: ""
+                    min_level: 0
+                    max_level: 0
+                    poke_ball_used: ""
+                    pokemon: ""
+                    pokemon_type: ""
+                    region: ""
+                    shiny: false
+                    tera_type: ""
+                    z_crystal: ""
+                    dynamax_type: "gigantamax"
+                    time_max: 24000L
+                    time_min: 0L
+                    type: "cobblemon_tasks:cobblemon_task"
+                }
+            ]
+            title: "Gigantamax Test (Mega Showdown)"
+            x: 1.5d
+            y: 7.5d
+        }
+        {
+            dependencies: ["dynamax_test"]
+            description: ["Test quest for Ultra Burst action (requires Mega Showdown)"]
+            icon: "cobblemon:pokemon_model"
+            id: "ultra_burst_test"
+            tasks: [
+                {
+                    action: "ultra_burst"
+                    amount: 1L
+                    biome: ""
+                    dimension: ""
+                    form: ""
+                    gender: ""
+                    id: "ultra_burst_task"
+                    mega_form: ""
+                    min_level: 0
+                    max_level: 0
+                    poke_ball_used: ""
+                    pokemon: "necrozma"
+                    pokemon_type: ""
+                    region: ""
+                    shiny: false
+                    tera_type: ""
+                    z_crystal: ""
+                    dynamax_type: ""
+                    time_max: 24000L
+                    time_min: 0L
+                    type: "cobblemon_tasks:cobblemon_task"
+                }
+            ]
+            title: "Ultra Burst Test (Mega Showdown)"
+            x: 3.0d
+            y: 7.5d
+        }
+        {
+            dependencies: [
+                "mega_evolution_test"
+                "terastallization_test"
+                "z_move_test"
+                "hatch_egg_test"
+            ]
+            description: ["Complete all core extended feature quests to finish the test chapter!"]
+            icon: "cobblemon:master_ball"
+            id: "completion_test"
+            tasks: [
+                {
+                    action: "catch"
+                    amount: 1L
+                    biome: ""
+                    dimension: ""
+                    form: ""
+                    gender: ""
+                    id: "completion_task"
+                    mega_form: ""
+                    min_level: 0
+                    max_level: 0
+                    poke_ball_used: ""
+                    pokemon: ""
+                    pokemon_type: ""
+                    region: ""
+                    shiny: false
+                    tera_type: ""
+                    z_crystal: ""
+                    dynamax_type: ""
+                    time_max: 24000L
+                    time_min: 0L
+                    type: "cobblemon_tasks:cobblemon_task"
+                }
+            ]
+            title: "Extended Features Complete!"
+            x: 4.5d
+            y: 3.0d
+        }
+    ]
+    title: "Extended Features Test"
+}

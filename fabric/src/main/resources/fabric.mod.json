@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "name": "${mod_name}",
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "description": "${mod_description}",
+  "authors": ["WinterWolfSV"],
+  "contact": {"repo": "${repository}"},
+  "license": "${license}",
+  "icon": "${mod_icon}",
+  "environment": "${environment}",
+  "entrypoints": {
+    "main": ["cobblemonquestsextended.cobblemon_quests_extended_extended.fabric.Cobblemon_QuestsFabric"]
+  },
+  "depends": {
+    "fabricloader": "*",
+    "fabric": "*",
+    "minecraft": "${supported_minecraft_versions}",
+    "cobblemon": ">=1.7.0",
+    "architectury": ">=13.0.0",
+    "ftbquests": ">=2101.0.0"
+  }
+}
