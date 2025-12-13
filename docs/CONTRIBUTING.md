@@ -63,8 +63,8 @@ To build all platform variants:
 ```
 
 Built JAR files will be in:
-- `fabric/build/libs/cobblemon_quests_extended-[1.21.1]-fabric-1.0.0.jar`
-- `neoforge/build/libs/cobblemon_quests_extended-[1.21.1]-neoforge-1.0.0.jar`
+- `fabric/build/libs/cobblemon_quests_extended-1.21.1-fabric-{version}.jar`
+- `neoforge/build/libs/cobblemon_quests_extended-1.21.1-neoforge-{version}.jar`
 
 ### Platform-Specific Builds
 
@@ -878,14 +878,14 @@ mod_version=1.0.0
 Builds include Minecraft version in filename:
 
 ```
-cobblemon_quests_extended-[1.21.1]-fabric-1.0.0.jar
-cobblemon_quests_extended-[1.21.1]-neoforge-1.0.0.jar
+cobblemon_quests_extended-1.21.1-fabric-{version}.jar
+cobblemon_quests_extended-1.21.1-neoforge-{version}.jar
 ```
 
 This is configured via `archives_base_name` in `gradle.properties`:
 
 ```properties
-archives_base_name=cobblemon_quests_extended-[1.21.1]
+archives_base_name=cobblemon_quests_extended-1.21.1
 ```
 
 ## Additional Resources
