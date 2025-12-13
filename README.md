@@ -37,7 +37,7 @@ This fork extends the original mod with new features for Cobblemon 1.7.0+ includ
 - **Hatch Egg**: Create quests for hatching eggs (with full condition support including shiny)
 
 #### Mega Showdown Integration (Optional)
-When [Cobblemon: Mega Showdown](https://modrinth.com/mod/mega-showdown) is installed:
+When [Cobblemon: Mega Showdown](https://modrinth.com/mod/cobblemon-mega-showdown) is installed:
 - **Dynamax**: Track Dynamax transformations
 - **Gigantamax**: Require specific Gigantamax forms
 - **Ultra Burst**: Monitor Necrozma's Ultra Burst
@@ -74,7 +74,7 @@ This mod must be installed on **both client and server**.
 
 ## Installation
 
-1. Download the latest release from the [Releases](https://github.com/yourusername/cobblemon_quests_extended/releases) page
+1. Download the latest release from the [Releases](https://github.com/DeadshotOMEGA/cobblemon_quests_extended/releases) page
 2. Place the mod JAR file in your `mods` folder
 3. Ensure Cobblemon 1.7.0+ and FTB Quests are also installed
 4. (Optional) Install Cobblemon: Mega Showdown for additional features
@@ -86,7 +86,7 @@ This mod must be installed on **both client and server**.
 Simply play the game and check your quest book. Quest tasks will automatically trigger as you catch, battle, and interact with Pokemon. The quest descriptions should be self-explanatory.
 
 ### For Quest Creators
-Comprehensive documentation for creating quests is available in [quest-creation.md](/home/sauk/cobble-quests/cobblemon-quests-extended/quest-creation.md).
+Comprehensive documentation for creating quests is available in [docs/QUEST-CREATION.md](docs/QUEST-CREATION.md).
 
 **Quick Examples:**
 
@@ -130,11 +130,11 @@ Comprehensive documentation for creating quests is available in [quest-creation.
 }
 ```
 
-See the [quest creation documentation](/home/sauk/cobble-quests/cobblemon-quests-extended/quest-creation.md) for all available actions, conditions, and detailed examples.
+See the [quest creation documentation](...) for all available actions, conditions, and detailed examples.
 
 ## Documentation
 
-- **[Quest Creation Guide](/home/sauk/cobble-quests/cobblemon-quests-extended/quest-creation.md)**: Complete documentation for quest creators
+- **[Quest Creation Guide](...)**: Complete documentation for quest creators
 - **[Original Cobblemon Quests](https://github.com/WinterWolfSV/Cobblemon_Quests)**: Upstream project by WinterWolfSV
 
 ## FAQ
@@ -171,7 +171,7 @@ A: Yes! Use the ActionRegistry system to register custom actions from your add-o
 /cobblemonquests givepokemon <player> <should_give> <amount> {<actions>} <pokemon>
 ```
 
-See [quest-creation.md](/home/sauk/cobble-quests/cobblemon-quests-extended/quest-creation.md) for command details.
+See [docs/QUEST-CREATION.md](docs/QUEST-CREATION.md) for command details.
 
 ## Contributing
 
@@ -193,7 +193,7 @@ You must:
 **Original Work**: [Cobblemon Quests](https://github.com/WinterWolfSV/Cobblemon_Quests) by WinterWolfSV
 **Extended By**: This fork
 
-See the [LICENSE](/home/sauk/cobble-quests/cobblemon-quests-extended/LICENSE) file for full license terms.
+See the [LICENSE](https://github.com/DeadshotOMEGA/cobblemon-quests-extended/blob/develop/LICENSE) file for full license terms.
 
 ## Credits
 
@@ -205,7 +205,7 @@ See the [LICENSE](/home/sauk/cobble-quests/cobblemon-quests-extended/LICENSE) fi
 ## Support & Feedback
 
 ### For This Fork
-- **Issues**: Submit bug reports and feature requests on the [GitHub Issues](https://github.com/yourusername/cobblemon_quests_extended/issues) page
+- **Issues**: Submit bug reports and feature requests on the [GitHub Issues](https://github.com/DeadshotOMEGA/cobblemon-quests-extended/issues) page
 
 ### For Original Features
 - **Discord**: Contact WinterWolfSV directly (winterwolfsv)
