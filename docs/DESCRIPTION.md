@@ -38,13 +38,29 @@ When [Cobblemon: Mega Showdown](https://modrinth.com/mod/cobblemon-mega-showdown
 
 ## 📋 Requirements
 
+Available for both **Fabric** and **NeoForge**!
+
+### Common Requirements
+
 | Dependency | Version |
 |------------|---------|
 | Minecraft | 1.21.1 |
 | Cobblemon | 1.7.0+ |
 | FTB Quests | Latest for 1.21.1 |
+
+### Fabric Version
+
+| Dependency | Version |
+|------------|---------|
 | Fabric Loader | 0.18.1+ |
 | Fabric API | 0.116.7+ |
+
+### NeoForge Version
+
+| Dependency | Version |
+|------------|---------|
+| NeoForge | 21.1.x |
+| Kotlin for Forge | 5.10.0+ |
 
 **Installation:** Required on both **client and server**.
 
