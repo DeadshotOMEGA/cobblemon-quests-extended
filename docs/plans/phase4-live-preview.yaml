@@ -1,0 +1,156 @@
+# Phase 4: Live Preview + UI Integration
+# Created: 2025-12-13
+# Status: COMPLETED
+
+metadata:
+  phase: 4
+  title: "Live Preview + UI Integration"
+  version: "1.5.0"
+  created_at: "2025-12-13"
+  branch: "feature/enhanced-ui-domain-model"
+
+status:
+  current_tier: DONE
+  current_stage: "ready_to_commit"
+  completed_tiers: [T0, T1, T3, T4, T5]
+  last_checkpoint: "2025-12-13T02:00:00Z"
+  notes: "All tiers completed. Code review passed with fixes applied. Ready to commit."
+
+# Tier execution tracking
+tiers:
+  T0:
+    name: "Git Setup"
+    status: "completed"
+    notes: "Already on feature/enhanced-ui-domain-model branch"
+
+  T1:
+    name: "Exploration"
+    status: "completed"
+    agents:
+      - name: "Explore"
+        status: "completed"
+        purpose: "Review Config*Type classes and selector screens integration points"
+    outputs:
+      - "Found 11 existing Config*Types, 2 missing (Z-Crystal, Dynamax)"
+      - "Identified addConfigList() as integration point"
+
+  T3:
+    name: "Planning"
+    status: "completed"
+    agents:
+      - name: "Plan"
+        status: "completed"
+        purpose: "Create detailed implementation plan for 3 parts"
+    outputs:
+      - "Phase 4 plan documented in quick-mapping.md"
+
+  T4:
+    name: "Implementation"
+    status: "completed"
+    parallel: true
+    agents:
+      - name: "programmer"
+        task: "Part A"
+        status: "completed"
+        agent_id: "af15d6c"
+        purpose: "Wire ConfigValue types to CobblemonTask.fillConfigGroup()"
+        files:
+          - "tasks/CobblemonTask.java"
+          - "client/config/ConfigZCrystalType.java"
+          - "client/config/ConfigDynamaxType.java"
+          - "client/gui/selectors/SelectZCrystalScreen.java"
+          - "client/gui/selectors/SelectDynamaxScreen.java"
+      - name: "programmer"
+        task: "Part B"
+        status: "completed"
+        agent_id: "a805959"
+        purpose: "Implement NaturalLanguageGenerator"
+        files:
+          - "preview/NaturalLanguageGenerator.java"
+          - "preview/ConditionFormatter.java"
+      - name: "programmer"
+        task: "Part C"
+        status: "completed"
+        agent_id: "ada7204"
+        purpose: "Implement LivePreviewPanel"
+        files:
+          - "preview/LivePreviewPanel.java"
+          - "client/gui/CobblemonTaskEditScreen.java"
+    outputs:
+      - "All 13 Config*Types now wired in CobblemonTask"
+      - "NaturalLanguageGenerator generates human-readable quest descriptions"
+      - "LivePreviewPanel integrated into CobblemonTaskEditScreen"
+
+  T5:
+    name: "Validation"
+    status: "completed"
+    agents:
+      - name: "code-reviewer"
+        status: "completed"
+        agent_id: "ab500ed"
+        purpose: "Review all implementations"
+    outputs:
+      - "0 critical issues, 7 warnings, 5 suggestions"
+      - "Fixed W1: Removed duplicated ZCRYSTAL_COLORS map"
+      - "Fixed W2: Removed duplicated Dynamax colors"
+      - "Fixed W7: Standardized time boundaries (12000)"
+
+# Key files discovered
+context:
+  existing_files:
+    config_types:
+      - "client/config/ConfigTypeSelector.java"
+      - "client/config/ConfigPokemonType.java"
+      - "client/config/ConfigFormType.java"
+      - "client/config/ConfigBiomeType.java"
+      - "client/config/ConfigDimensionType.java"
+      - "client/config/ConfigNatureType.java"
+      - "client/config/ConfigPokeBallType.java"
+      - "client/config/ConfigTeraType.java"
+      - "client/config/ConfigRegionType.java"
+      - "client/config/ConfigGenderType.java"
+      - "client/config/ConfigMegaFormType.java"
+    selectors:
+      - "client/gui/selectors/AbstractSelectorScreen.java"
+      - "client/gui/selectors/SelectTypeScreen.java"
+      - "client/gui/selectors/SelectNatureScreen.java"
+      - "client/gui/selectors/SelectBiomeScreen.java"
+      - "client/gui/selectors/SelectPokemonScreen.java"
+      - "client/gui/selectors/SelectFormScreen.java"
+      - "client/gui/selectors/SelectTeraTypeScreen.java"
+      - "client/gui/selectors/SelectRegionScreen.java"
+      - "client/gui/selectors/SelectGenderScreen.java"
+      - "client/gui/selectors/SelectMegaFormScreen.java"
+      - "client/gui/selectors/SelectDimensionScreen.java"
+      - "client/gui/selectors/SelectPokeBallScreen.java"
+    domain:
+      - "domain/CobblemonTaskModel.java"
+      - "domain/validation/TaskValidator.java"
+      - "domain/validation/ValidationResult.java"
+      - "domain/validation/ValidationIssue.java"
+      - "domain/validation/ValidationSeverity.java"
+    edit_screen:
+      - "client/gui/CobblemonTaskEditScreen.java"
+    task:
+      - "tasks/CobblemonTask.java"
+
+  integration_point:
+    file: "tasks/CobblemonTask.java"
+    method: "addConfigList()"
+    lines: "528-532"
+    issue: "Uses StringConfig instead of Config*Type classes"
+    fix: "Replace StringConfig with appropriate Config*Type for each field"
+
+# Files to create
+new_files:
+  - path: "preview/NaturalLanguageGenerator.java"
+    purpose: "Generate human-readable quest descriptions"
+  - path: "preview/ConditionFormatter.java"
+    purpose: "Format individual conditions for display"
+  - path: "preview/LivePreviewPanel.java"
+    purpose: "Combined preview + validation widget"
+
+# Resume instructions
+resume:
+  command: "/orchestrate cobblemon-quests-extended:Continue Phase 4 from docs/plans/phase4-live-preview.yaml"
+  context: "Read the plan file first to understand current state, then continue from current_tier"

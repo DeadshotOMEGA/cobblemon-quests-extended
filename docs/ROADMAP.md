@@ -8,8 +8,8 @@ This roadmap outlines the phased development plan for enhancing the quest creati
 |-------|------|--------|------|----------|
 | 1 | Foundation | ✅ Complete | LOW | v1.2.0 |
 | 2 | Smart Conditional Fields | ✅ Complete | MODERATE | v1.3.0 |
-| 3 | Domain Model + Validation | 🔲 Planned | MODERATE | v1.4.0 |
-| 4 | Live Preview | 🔲 Planned | LOW | v1.5.0 |
+| 3 | Domain Model + Validation | ✅ Complete | MODERATE | v1.4.0 |
+| 4 | Live Preview + UI Integration | ✅ Complete | MODERATE | v1.5.0 |
 | 5 | Web Editor | 🔲 Planned | HIGH | v2.0.0 |
 | 6 | CLI/API | 🔲 Planned | LOW | v2.1.0 |
 
@@ -145,133 +145,151 @@ public class FieldVisibilityRules {
 
 ---
 
-## Phase 3: Domain Model + Validation 🔲 PLANNED
+## Phase 3: Enhanced UI + Domain Model + Validation ✅ COMPLETE
 
-**Goal:** Clean separation between UI and data, enable validation
+**Goal:** Professional UI for all condition fields, clean data separation, validation
 **Risk:** MODERATE
-**Target Version:** 1.4.0
+**Version:** 1.4.0
+**Status:** Released 2025-12-13
 
-### Problem
+### Reference Documents
 
-Currently, quest data is tightly coupled to FTB Library's ConfigGroup. This makes:
-- Validation difficult (incompatible combinations aren't caught)
-- Testing difficult (need full GUI to test logic)
-- Reuse difficult (can't use task logic outside FTB Quests)
+- **[CONDITIONAL_FIELD_ANALYSIS.md](CONDITIONAL_FIELD_ANALYSIS.md)** - Comprehensive analysis of all 19 conditional fields, action-by-action visibility matrix for 28 actions, and proposed implementation
 
-### Deliverables
+### Implementation Status
 
-1. **CobblemonTaskModel** - Domain object (not UI-coupled)
-   - Pure data class with typed fields
-   - No dependency on FTB Library or Minecraft
-   - Builder pattern for construction
+#### ✅ Completed
 
-2. **TaskValidator** - Validate incompatible combinations
-   - Check action + condition compatibility
-   - Validate required fields for specific actions
-   - Return user-friendly error messages
+| Component | Files | Notes |
+|-----------|-------|-------|
+| **Domain Model** | `domain/CobblemonTaskModel.java` | Pure POJO with Builder pattern, `fromTask()` and `applyToTask()` methods |
+| **Validation System** | `domain/validation/*.java` | ValidationSeverity, ValidationIssue, ValidationResult, TaskValidator with 15+ rules |
+| **Serializer** | `domain/serialization/TaskModelSerializer.java` | NBT serialization with v1→v2 migration |
+| **Category Enums** | `registry/*.java` | PokemonTypeCategory, BiomeCategory, NatureCategory, FormCategory, PokemonGeneration |
+| **ConfigValue Types** | `client/config/Config*Type.java` | 11 new types with color coding and custom selectors |
+| **Selector Screens** | `client/gui/selectors/*.java` | AbstractSelectorScreen base + 11 specific screens |
+| **Localization** | `lang/en_us.json` | ~100 new translation keys for validation, categories, forms |
+| **Edit Screen** | `client/gui/CobblemonTaskEditScreen.java` | Validation integration, "Fix Errors" button state |
+| **Logging** | Throughout | Extensive logging for debugging validation flow |
 
-3. **TaskModelSerializer** - Convert model ↔ NBT
-   - Serialize model to NBT for storage
-   - Deserialize NBT to model
-   - Handle version migrations
+#### ✅ Completed in Phase 4
 
-4. **Validation feedback in GUI**
-   - Real-time validation as fields change
-   - Error indicators on invalid fields
-   - Tooltip with validation error message
+| Component | Issue | Resolution |
+|-----------|-------|------------|
+| **ConfigValue Integration** | New Config*Type classes wired to CobblemonTask.fillConfigGroup() | ✅ Done |
+| **Selector Screen Usage** | Selector screens now open when clicking fields | ✅ Done |
+| **Validation UI Feedback** | Validation errors/warnings shown in LivePreviewPanel | ✅ Done |
+| **Visual Error Indicators** | Errors and warnings visible in real-time preview | ✅ Done |
 
-### Files
+### Files Created
 
-**New:**
-- `model/CobblemonTaskModel.java` - Domain model
-- `model/CobblemonTaskModelBuilder.java` - Builder for model
-- `validation/TaskValidator.java` - Validation logic
-- `validation/ValidationResult.java` - Validation result container
-- `serialization/TaskModelSerializer.java` - NBT serialization
-- `client/gui/ValidationFeedback.java` - GUI validation indicators
+**Domain Layer (`domain/`):**
+- `CobblemonTaskModel.java` - Immutable domain model with Builder
+- `validation/ValidationSeverity.java` - ERROR/WARNING/INFO enum
+- `validation/ValidationIssue.java` - Record with field, messageKey, severity
+- `validation/ValidationResult.java` - Immutable result container
+- `validation/TaskValidator.java` - Validates models, 15+ rules
+- `serialization/TaskModelSerializer.java` - NBT with migration
 
-**Modified:**
-- `tasks/CobblemonTask.java` - Use model internally
-- `client/config/ConfigActionType.java` - Show validation errors
+**Category Enums (`registry/`):**
+- `PokemonTypeCategory.java` - PHYSICAL/SPECIAL
+- `BiomeCategory.java` - FOREST/PLAINS/DESERT/etc.
+- `NatureCategory.java` - NEUTRAL/PHYSICAL/SPECIAL/SPEED/DEFENSIVE
+- `FormCategory.java` - REGIONAL/MEGA/DYNAMAX/LEGENDARY/OTHER
+- `PokemonGeneration.java` - GEN_1 through GEN_9 with dex ranges
 
-### Validation Rules Examples
+**ConfigValue Types (`client/config/`):**
+- `ConfigTypeSelector.java` - Pokemon type (18 types)
+- `ConfigPokemonType.java` - Pokemon species
+- `ConfigFormType.java` - Forms/aspects
+- `ConfigBiomeType.java` - Biomes by category
+- `ConfigDimensionType.java` - Dimensions
+- `ConfigNatureType.java` - Natures (25)
+- `ConfigPokeBallType.java` - Poke Balls (27)
+- `ConfigTeraType.java` - Tera types (19)
+- `ConfigRegionType.java` - Regions (9)
+- `ConfigGenderType.java` - Genders (3)
+- `ConfigMegaFormType.java` - Mega forms (4)
 
-```java
-// Example validation rules
-public class TaskValidator {
-    public ValidationResult validate(CobblemonTaskModel model) {
-        List<String> errors = new ArrayList<>();
-
-        // Action-specific validations
-        if (model.getAction().contains("mega_evolve") && model.getMegaForm().isEmpty()) {
-            errors.add("Mega Evolution requires a mega_form (mega, mega-x, mega-y, or primal)");
-        }
-
-        if (model.getAction().contains("terastallize") && model.getTeraType().isEmpty()) {
-            errors.add("Terastallize requires a tera_type");
-        }
-
-        // Incompatible combinations
-        if (model.getAction().contains("defeat_npc") && !model.getPokemon().isEmpty()) {
-            errors.add("defeat_npc ignores pokemon filter - use form field for NPC names");
-        }
-
-        return new ValidationResult(errors.isEmpty(), errors);
-    }
-}
-```
+**Selector Screens (`client/gui/selectors/`):**
+- `AbstractSelectorScreen.java` - Generic base class
+- `SelectTypeScreen.java` - Extends AbstractSelectorScreen
+- `SelectNatureScreen.java` - Shows stat boost/penalty
+- `SelectBiomeScreen.java` - Loads from Minecraft registry
+- `SelectPokemonScreen.java` - Generation-based grouping, Cobblemon API reflection
+- `SelectFormScreen.java` - Form category grouping
+- `SelectTeraTypeScreen.java` - 18 types + stellar
+- `SelectRegionScreen.java` - 9 Pokemon regions
+- `SelectGenderScreen.java` - Male/Female/Genderless
+- `SelectMegaFormScreen.java` - Mega/X/Y/Primal
+- `SelectDimensionScreen.java` - Registry-based
+- `SelectPokeBallScreen.java` - 27 balls with colors
 
 ---
 
-## Phase 4: Live Preview 🔲 PLANNED
+## Phase 4: Live Preview + UI Integration ✅ COMPLETE
 
-**Goal:** Natural language preview of quest requirements
-**Risk:** LOW
-**Target Version:** 1.5.0
+**Goal:** Natural language preview + complete Phase 3 integration + validation feedback
+**Risk:** MODERATE
+**Version:** 1.5.0
+**Status:** Released 2025-12-13
 
-### Problem
+### Deliverables Completed
 
-Quest creators can't easily see what their quest will require without testing in-game. The current config fields are technical and don't clearly communicate the end result.
+#### Part A: Complete Phase 3 Integration ✅
 
-### Deliverables
+1. **ConfigValue types wired to CobblemonTask.fillConfigGroup()**
+   - Replaced `StringConfig` with new `Config*Type` classes
+   - All selector screens now open when clicking fields
 
-1. **NaturalLanguageGenerator** - Converts task model → English
+2. **All 11 selector screens tested and working**
+   - Pokemon (flat alphabetical list), Type, Nature, Biome, Dimension, Region, Gender, MegaForm, Form, TeraType, PokeBall
+
+#### Part B: Validation Feedback Panel ✅
+
+3. **LivePreviewPanel** - Combined preview + validation widget
+   - Shows on RIGHT side of edit screen (side-by-side layout)
+   - Real-time validation errors in red
+   - Real-time validation warnings in yellow
+   - Word wrapping for all content sections
+   - Updates as fields change
+
+4. **CobblemonTaskEditScreen Integration**
+   - Custom `alignWidgets()` for side-by-side layout
+   - Config panel on left, preview on right
+   - Validation results passed to panel in real-time
+
+#### Part C: Natural Language Preview ✅
+
+5. **NaturalLanguageGenerator** - Converts task model → English
    - Human-readable quest requirement description
-   - Supports all actions and conditions
+   - Supports all 28 actions and 19 condition fields
    - Handles pluralization and grammar
+   - Shows active conditions only
 
-2. **Preview panel widget in FTB-Quests GUI**
-   - Shows below the config fields
-   - Updates in real-time as fields change
-   - Clear visual separation from config
+### Files Created
 
-3. **Real-time updates**
-   - Subscribe to field changes
-   - Debounce rapid changes
-   - Smooth text transitions
+**Preview System (`preview/`):**
+- `NaturalLanguageGenerator.java` - Text generation engine with action-specific formatting
+- `LivePreviewPanel.java` - Combined preview + validation widget with word wrap
+- `ConditionFormatter.java` - Format individual conditions for display
 
-### Files
+**Registry (`registry/`):**
+- `PokemonListCategory.java` - Simple single-category enum for flat Pokemon list
 
-**New:**
-- `preview/NaturalLanguageGenerator.java` - Text generation
-- `preview/PreviewPanel.java` - GUI widget
-- `preview/PreviewUpdateListener.java` - Change listener
+### Files Modified
 
-### Example Output
+- `tasks/CobblemonTask.java` - Replaced StringConfig with Config*Type classes
+- `client/gui/CobblemonTaskEditScreen.java` - Side-by-side layout with LivePreviewPanel
+- `client/gui/selectors/SelectPokemonScreen.java` - Simplified to flat alphabetical list
+- `lang/en_us.json` - Added preview translation keys
 
-```
-Quest Requirement Preview:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
-"Catch 5 shiny Pikachu or Raichu using a Premier Ball
-in the Plains biome during daytime."
+### UI Improvements
 
-Conditions:
-• Species: Pikachu, Raichu
-• Must be shiny
-• Ball: Premier Ball
-• Biome: Plains
-• Time: Day (0-12000 ticks)
-```
+- **Collapsible config groups** - Action, Pokemon, Level, Location, Capture, Pokedex, Gimmicks
+- **Side-by-side layout** - Config fields on left, live preview on right
+- **Word wrapping** - All preview panel sections wrap text properly
+- **Flat Pokemon list** - Removed generation grouping, pure alphabetical
 
 ---
 
@@ -450,8 +468,8 @@ cobblemon-quests-cli/
 |---------|-------|--------------|
 | 1.2.0 | Phase 1 | Action Picker UI, tooltips, categories |
 | 1.3.0 | Phase 2 | Smart field visibility, field groups |
-| 1.4.0 | Phase 3 | Domain model, validation |
-| 1.5.0 | Phase 4 | Live preview, natural language |
+| 1.4.0 | Phase 3 | Domain model, validation (infrastructure only) |
+| 1.5.0 | Phase 4 | Live preview, ConfigValue integration, validation UI |
 | 2.0.0 | Phase 5 | Web editor |
 | 2.1.0 | Phase 6 | CLI/API |
 
