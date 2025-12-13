@@ -93,7 +93,7 @@ public class SelectGenderScreen extends AbstractButtonListScreen {
         private final String gender;
 
         public GenderButton(Panel panel, String gender) {
-            super(panel, Component.translatable("cobblemon_quests_extended.gender." + gender), Color4I.empty());
+            super(panel, Component.translatable("cobblemon_quests_extended.genders." + gender), Color4I.empty());
             this.gender = gender;
             setHeight(16);
         }
@@ -119,7 +119,7 @@ public class SelectGenderScreen extends AbstractButtonListScreen {
 
         @Override
         public void addMouseOverText(TooltipList list) {
-            list.add(Component.translatable("cobblemon_quests_extended.gender." + gender)
+            list.add(Component.translatable("cobblemon_quests_extended.genders." + gender)
                     .withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD));
         }
     }

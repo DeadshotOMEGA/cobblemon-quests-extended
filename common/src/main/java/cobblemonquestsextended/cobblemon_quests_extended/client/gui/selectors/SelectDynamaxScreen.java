@@ -86,7 +86,7 @@ public class SelectDynamaxScreen extends AbstractButtonListScreen {
         private final String dynamaxType;
 
         public DynamaxTypeButton(Panel panel, String dynamaxType) {
-            super(panel, Component.translatable("cobblemon_quests_extended.dynamax_type." + dynamaxType),
+            super(panel, Component.translatable("cobblemon_quests_extended.dynamax_types." + dynamaxType),
                     Color4I.empty());
             this.dynamaxType = dynamaxType;
             setHeight(18);
@@ -125,12 +125,12 @@ public class SelectDynamaxScreen extends AbstractButtonListScreen {
 
         @Override
         public void addMouseOverText(TooltipList list) {
-            list.add(Component.translatable("cobblemon_quests_extended.dynamax_type." + dynamaxType)
+            list.add(Component.translatable("cobblemon_quests_extended.dynamax_types." + dynamaxType)
                     .withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD));
-            list.add(Component.translatable("cobblemon_quests_extended.dynamax_type." + dynamaxType + ".desc")
+            list.add(Component.translatable("cobblemon_quests_extended.dynamax_types." + dynamaxType + ".desc")
                     .withStyle(ChatFormatting.GRAY));
             if (dynamaxType.equals("gigantamax")) {
-                list.add(Component.translatable("cobblemon_quests_extended.dynamax_type.gigantamax.special")
+                list.add(Component.translatable("cobblemon_quests_extended.dynamax_types.gigantamax.special")
                         .withStyle(ChatFormatting.LIGHT_PURPLE));
             }
         }

@@ -69,25 +69,33 @@ public class LivePreviewPanel extends Panel {
     private static final Color4I MUTED_COLOR = Color4I.rgb(0x808080);    // Muted text
 
     // Layout constants
-    private static final int PADDING = 6;
-    private static final int LINE_HEIGHT = 11;
-    private static final int SECTION_SPACING = 8;
-    private static final int HEADER_HEIGHT = 14;
+    private static final int PADDING = 8;
+    private static final int LINE_HEIGHT = 12;
+    private static final int SECTION_SPACING = 6;
+    private static final int HEADER_HEIGHT = 16;
+    private static final int TEXT_VERTICAL_OFFSET = 3;  // Offset for text centering in headers
 
     public LivePreviewPanel(Panel parent, CobblemonTask task) {
         super(parent);
         this.task = task;
         this.validator = new TaskValidator();
-        refresh();
+        // Initial refresh with task data (will be updated with real ConfigValue data)
+        refresh(CobblemonTaskModel.fromTask(task));
     }
 
     /**
-     * Refreshes the panel with current task state.
-     * Call this when task fields change.
+     * Refreshes the panel with current task state from the stale task object.
+     * Use refresh(CobblemonTaskModel) for real-time preview from ConfigValues.
      */
     public void refresh() {
-        CobblemonTaskModel model = CobblemonTaskModel.fromTask(task);
+        refresh(CobblemonTaskModel.fromTask(task));
+    }
 
+    /**
+     * Refreshes the panel with the given model.
+     * This is the preferred method - use a model built from current ConfigValue state.
+     */
+    public void refresh(CobblemonTaskModel model) {
         // Generate preview text using NaturalLanguageGenerator if available
         this.previewText = generatePreviewText(model);
 
@@ -357,21 +365,21 @@ public class LivePreviewPanel extends Panel {
         BORDER_COLOR.draw(graphics, x + w - 1, y, 1, h);  // Right border
         BORDER_COLOR.draw(graphics, x, y + h - 1, w, 1);  // Bottom border
 
-        int yOffset = y + PADDING;
+        int yOffset = y + PADDING / 2;
 
         // Section 1: Quest Preview Header
         yOffset = drawSectionHeader(graphics, theme, x, yOffset, w,
             Component.translatable(MOD_ID + ".preview.title"));
 
-        // Section 1: Preview text
+        // Section 1: Preview text with word wrap (allow up to 5 lines for quest descriptions)
         yOffset = drawWrappedText(graphics, theme, x + PADDING, yOffset, w - PADDING * 2,
-            previewText, TEXT_COLOR, 3);
+            previewText, TEXT_COLOR, 5);
         yOffset += SECTION_SPACING;
 
         // Section 2: Errors (if any)
         if (validationResult.getErrorCount() > 0) {
             BORDER_COLOR.draw(graphics, x, yOffset, w, 1);
-            yOffset += 1;
+            yOffset += 2;
 
             yOffset = drawSectionHeader(graphics, theme, x, yOffset, w,
                 Component.translatable(MOD_ID + ".preview.errors")
@@ -381,13 +389,13 @@ public class LivePreviewPanel extends Panel {
                 yOffset = drawIssue(graphics, theme, x + PADDING, yOffset, w - PADDING * 2,
                     issue, ERROR_COLOR);
             }
-            yOffset += SECTION_SPACING / 2;
+            yOffset += SECTION_SPACING;
         }
 
         // Section 3: Warnings (if any)
         if (validationResult.getWarningCount() > 0) {
             BORDER_COLOR.draw(graphics, x, yOffset, w, 1);
-            yOffset += 1;
+            yOffset += 2;
 
             yOffset = drawSectionHeader(graphics, theme, x, yOffset, w,
                 Component.translatable(MOD_ID + ".preview.warnings")
@@ -397,12 +405,12 @@ public class LivePreviewPanel extends Panel {
                 yOffset = drawIssue(graphics, theme, x + PADDING, yOffset, w - PADDING * 2,
                     issue, WARNING_COLOR);
             }
-            yOffset += SECTION_SPACING / 2;
+            yOffset += SECTION_SPACING;
         }
 
         // Section 4: Active Conditions
         BORDER_COLOR.draw(graphics, x, yOffset, w, 1);
-        yOffset += 1;
+        yOffset += 2;
 
         yOffset = drawSectionHeader(graphics, theme, x, yOffset, w,
             Component.translatable(MOD_ID + ".preview.active_conditions"));
@@ -411,32 +419,45 @@ public class LivePreviewPanel extends Panel {
             theme.drawString(graphics,
                 Component.translatable(MOD_ID + ".preview.no_conditions")
                     .withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY),
-                x + PADDING + 8, yOffset, MUTED_COLOR, 0);
+                x + PADDING + 6, yOffset, MUTED_COLOR, 0);
             yOffset += LINE_HEIGHT;
         } else {
             for (Component condition : activeConditions) {
-                MutableComponent bullet = Component.literal("* ").withStyle(ChatFormatting.GRAY);
-                theme.drawString(graphics, bullet.append(condition), x + PADDING + 4, yOffset, TEXT_COLOR, 0);
-                yOffset += LINE_HEIGHT;
+                // Draw bullet and condition with word wrap
+                yOffset = drawBulletedWrappedText(graphics, theme, x + PADDING + 2, yOffset,
+                    w - PADDING * 2 - 4, condition, TEXT_COLOR);
             }
         }
     }
 
     private int drawSectionHeader(GuiGraphics graphics, Theme theme, int x, int y, int w, Component title) {
         HEADER_BG.draw(graphics, x + 1, y, w - 2, HEADER_HEIGHT);
-        theme.drawString(graphics, title, x + PADDING, y + 3, Color4I.WHITE, 0);
-        return y + HEADER_HEIGHT;
+        // Center text vertically in header
+        int textY = y + (HEADER_HEIGHT - 9) / 2 + 1;  // 9 is approx font height
+        theme.drawString(graphics, title, x + PADDING, textY, Color4I.WHITE, 0);
+        return y + HEADER_HEIGHT + 2;  // Add small gap after header
     }
 
+    /**
+     * Draws text with word wrapping.
+     * @param maxLines Maximum lines to draw, or -1 for unlimited
+     */
     private int drawWrappedText(GuiGraphics graphics, Theme theme, int x, int y, int maxWidth,
                                 Component text, Color4I color, int maxLines) {
         String str = text.getString();
+        if (str.isEmpty()) {
+            // Draw placeholder for empty text
+            theme.drawString(graphics, Component.literal("(none)").withStyle(ChatFormatting.ITALIC),
+                x, y, MUTED_COLOR, 0);
+            return y + LINE_HEIGHT;
+        }
+
         List<String> lines = wrapText(str, maxWidth, theme);
 
         int linesDrawn = 0;
         for (String line : lines) {
-            if (linesDrawn >= maxLines) {
-                // Draw ellipsis
+            if (maxLines > 0 && linesDrawn >= maxLines) {
+                // Draw ellipsis on the last allowed line
                 theme.drawString(graphics, Component.literal("..."), x, y, MUTED_COLOR, 0);
                 y += LINE_HEIGHT;
                 break;
@@ -485,52 +506,99 @@ public class LivePreviewPanel extends Panel {
         // Color indicator bar
         color.draw(graphics, x, y + 1, 2, LINE_HEIGHT - 2);
 
-        // Field name in brackets
+        // Field name in brackets + message combined for word wrapping
         String fieldText = "[" + issue.field() + "] ";
-        theme.drawString(graphics, Component.literal(fieldText).withStyle(ChatFormatting.DARK_GRAY),
-            x + 5, y, MUTED_COLOR, 0);
-
-        // Message
-        int fieldWidth = theme.getStringWidth(Component.literal(fieldText));
         Component message = Component.translatable(issue.messageKey(), issue.messageArgs());
-        theme.drawString(graphics, message.copy().withStyle(s -> s.withColor(color.rgba())),
-            x + 5 + fieldWidth, y, color, 0);
+        String fullText = fieldText + message.getString();
 
-        return y + LINE_HEIGHT;
+        // Word wrap the combined text
+        List<String> lines = wrapText(fullText, w - 8, theme);
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            // First line has field name in different color
+            if (i == 0 && line.startsWith(fieldText)) {
+                theme.drawString(graphics, Component.literal(fieldText).withStyle(ChatFormatting.DARK_GRAY),
+                    x + 5, y, MUTED_COLOR, 0);
+                int fieldWidth = theme.getStringWidth(Component.literal(fieldText));
+                String remainder = line.substring(fieldText.length());
+                theme.drawString(graphics, Component.literal(remainder).withStyle(s -> s.withColor(color.rgba())),
+                    x + 5 + fieldWidth, y, color, 0);
+            } else {
+                // Continuation lines are just the message color
+                theme.drawString(graphics, Component.literal("  " + line).withStyle(s -> s.withColor(color.rgba())),
+                    x + 5, y, color, 0);
+            }
+            y += LINE_HEIGHT;
+        }
+
+        return y;
+    }
+
+    /**
+     * Draws bulleted text with word wrapping.
+     */
+    private int drawBulletedWrappedText(GuiGraphics graphics, Theme theme, int x, int y, int maxWidth,
+                                        Component text, Color4I color) {
+        String str = text.getString();
+        if (str.isEmpty()) {
+            return y;
+        }
+
+        // Calculate indent for continuation lines (after bullet)
+        String bullet = "* ";
+        int bulletWidth = theme.getStringWidth(Component.literal(bullet));
+
+        List<String> lines = wrapText(str, maxWidth - bulletWidth, theme);
+
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            if (i == 0) {
+                // First line with bullet
+                theme.drawString(graphics, Component.literal(bullet).withStyle(ChatFormatting.GRAY),
+                    x, y, MUTED_COLOR, 0);
+                theme.drawString(graphics, Component.literal(line), x + bulletWidth, y, color, 0);
+            } else {
+                // Continuation lines indented to align with first line text
+                theme.drawString(graphics, Component.literal(line), x + bulletWidth, y, color, 0);
+            }
+            y += LINE_HEIGHT;
+        }
+
+        return y;
     }
 
     /**
      * Calculates the required height for this panel based on content.
      */
     public int calculateRequiredHeight() {
-        int height = PADDING;
+        int height = PADDING / 2;
 
-        // Header
-        height += HEADER_HEIGHT;
+        // Header + gap after
+        height += HEADER_HEIGHT + 2;
 
-        // Preview text (estimate 3 lines max)
-        height += LINE_HEIGHT * 3;
+        // Preview text (estimate 5 lines max)
+        height += LINE_HEIGHT * 5;
         height += SECTION_SPACING;
 
         // Errors
         if (validationResult.getErrorCount() > 0) {
-            height += 1; // border
-            height += HEADER_HEIGHT;
+            height += 2; // border + gap
+            height += HEADER_HEIGHT + 2;
             height += validationResult.getErrorCount() * LINE_HEIGHT;
-            height += SECTION_SPACING / 2;
+            height += SECTION_SPACING;
         }
 
         // Warnings
         if (validationResult.getWarningCount() > 0) {
-            height += 1; // border
-            height += HEADER_HEIGHT;
+            height += 2; // border + gap
+            height += HEADER_HEIGHT + 2;
             height += validationResult.getWarningCount() * LINE_HEIGHT;
-            height += SECTION_SPACING / 2;
+            height += SECTION_SPACING;
         }
 
         // Conditions
-        height += 1; // border
-        height += HEADER_HEIGHT;
+        height += 2; // border + gap
+        height += HEADER_HEIGHT + 2;
         height += Math.max(1, activeConditions.size()) * LINE_HEIGHT;
         height += PADDING;
 

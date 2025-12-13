@@ -64,13 +64,13 @@ public class SelectZCrystalScreen extends AbstractButtonListScreen {
     @Override
     public void addButtons(Panel panel) {
         // Add section header for type-specific Z-Crystals
-        panel.add(new SectionHeader(panel, "cobblemon_quests_extended.z_crystal.section.type"));
+        panel.add(new SectionHeader(panel, "cobblemon_quests_extended.z_crystals.section.type"));
         for (String zCrystal : TYPE_ZCRYSTALS) {
             panel.add(new ZCrystalButton(panel, zCrystal, false));
         }
 
         // Add section header for Pokemon-specific Z-Crystals
-        panel.add(new SectionHeader(panel, "cobblemon_quests_extended.z_crystal.section.pokemon"));
+        panel.add(new SectionHeader(panel, "cobblemon_quests_extended.z_crystals.section.pokemon"));
         for (String zCrystal : POKEMON_ZCRYSTALS) {
             panel.add(new ZCrystalButton(panel, zCrystal, true));
         }
@@ -123,7 +123,7 @@ public class SelectZCrystalScreen extends AbstractButtonListScreen {
         private final boolean isPokemonSpecific;
 
         public ZCrystalButton(Panel panel, String zCrystal, boolean isPokemonSpecific) {
-            super(panel, Component.translatable("cobblemon_quests_extended.z_crystal." + zCrystal), Color4I.empty());
+            super(panel, Component.translatable("cobblemon_quests_extended.z_crystals." + zCrystal), Color4I.empty());
             this.zCrystal = zCrystal;
             this.isPokemonSpecific = isPokemonSpecific;
             setHeight(14);
@@ -162,12 +162,12 @@ public class SelectZCrystalScreen extends AbstractButtonListScreen {
 
         @Override
         public void addMouseOverText(TooltipList list) {
-            list.add(Component.translatable("cobblemon_quests_extended.z_crystal." + zCrystal)
+            list.add(Component.translatable("cobblemon_quests_extended.z_crystals." + zCrystal)
                     .withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD));
-            list.add(Component.translatable("cobblemon_quests_extended.z_crystal.desc")
+            list.add(Component.translatable("cobblemon_quests_extended.z_crystals.desc")
                     .withStyle(ChatFormatting.GRAY));
             if (isPokemonSpecific) {
-                list.add(Component.translatable("cobblemon_quests_extended.z_crystal.pokemon_specific")
+                list.add(Component.translatable("cobblemon_quests_extended.z_crystals.pokemon_specific")
                         .withStyle(ChatFormatting.YELLOW));
             }
         }

@@ -28,7 +28,7 @@ public class SelectMegaFormScreen extends AbstractButtonListScreen {
     private final ConfigMegaFormType config;
     private final ConfigCallback callback;
 
-    private static final List<String> ALL_MEGA_FORMS = List.of("mega", "mega_x", "mega_y", "primal");
+    private static final List<String> ALL_MEGA_FORMS = List.of("mega", "mega-x", "mega-y", "primal");
     private static final int MEGA_COLOR = 0xE91E63;
     private static final int MEGA_X_COLOR = 0x3498DB;
     private static final int MEGA_Y_COLOR = 0xE74C3C;
@@ -85,8 +85,8 @@ public class SelectMegaFormScreen extends AbstractButtonListScreen {
     private int getFormColor(String form) {
         return switch (form.toLowerCase()) {
             case "mega" -> MEGA_COLOR;
-            case "mega_x" -> MEGA_X_COLOR;
-            case "mega_y" -> MEGA_Y_COLOR;
+            case "mega-x" -> MEGA_X_COLOR;
+            case "mega-y" -> MEGA_Y_COLOR;
             case "primal" -> PRIMAL_COLOR;
             default -> MEGA_COLOR;
         };
@@ -96,7 +96,7 @@ public class SelectMegaFormScreen extends AbstractButtonListScreen {
         private final String form;
 
         public MegaFormButton(Panel panel, String form) {
-            super(panel, Component.translatable("cobblemon_quests_extended.mega_form." + form), Color4I.empty());
+            super(panel, Component.translatable("cobblemon_quests_extended.mega_forms." + form), Color4I.empty());
             this.form = form;
             setHeight(16);
         }
@@ -122,9 +122,9 @@ public class SelectMegaFormScreen extends AbstractButtonListScreen {
 
         @Override
         public void addMouseOverText(TooltipList list) {
-            list.add(Component.translatable("cobblemon_quests_extended.mega_form." + form)
+            list.add(Component.translatable("cobblemon_quests_extended.mega_forms." + form)
                     .withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD));
-            list.add(Component.translatable("cobblemon_quests_extended.mega_form." + form + ".desc")
+            list.add(Component.translatable("cobblemon_quests_extended.mega_forms." + form + ".desc")
                     .withStyle(ChatFormatting.GRAY));
         }
     }

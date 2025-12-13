@@ -64,7 +64,50 @@ public class ConfigPokemonType extends ConfigValue<String> {
         // Try to get translated species name from Cobblemon
         // Use ResourceLocation format: cobblemon:pikachu -> pikachu
         String speciesId = value.contains(":") ? value.split(":")[1] : value;
-        return Component.translatable("cobblemon.species." + speciesId + ".name");
+
+        try {
+            // Try Cobblemon's translation key first
+            String translationKey = "cobblemon.species." + speciesId + ".name";
+            if (net.minecraft.client.resources.language.I18n.exists(translationKey)) {
+                return Component.translatable(translationKey);
+            }
+        } catch (Exception e) {
+            // Translation lookup failed, use fallback
+        }
+
+        // Fall back to nicely formatted name
+        return Component.literal(formatPokemonName(speciesId));
+    }
+
+    /**
+     * Formats a Pokemon ID into a readable display name.
+     * Converts underscores/dashes to spaces and capitalizes words.
+     */
+    private String formatPokemonName(String name) {
+        if (name == null || name.isEmpty()) {
+            return "Unknown";
+        }
+
+        try {
+            // Replace underscores and dashes with spaces, then capitalize each word
+            String[] words = name.replace("_", " ").replace("-", " ").split(" ");
+            StringBuilder result = new StringBuilder();
+            for (String word : words) {
+                if (word != null && !word.isEmpty()) {
+                    if (result.length() > 0) {
+                        result.append(" ");
+                    }
+                    result.append(Character.toUpperCase(word.charAt(0)));
+                    if (word.length() > 1) {
+                        result.append(word.substring(1).toLowerCase());
+                    }
+                }
+            }
+            return result.length() > 0 ? result.toString() : name;
+        } catch (Exception e) {
+            // Fallback to original name if formatting fails
+            return name;
+        }
     }
 
     @Override
