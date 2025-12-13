@@ -105,6 +105,16 @@ public class FieldVisibilityRules {
 }
 ```
 
+### Execution Plan
+
+| Tier | Stage | Agent | Purpose |
+|------|-------|-------|---------|
+| T0 | Git Setup | `git-flow-manager` | Create feature/smart-conditional-fields branch |
+| T1 | Explore | `Explore` | Analyze CobblemonTask, ActionRegistry, FTB config system |
+| T3 | Planning | `Plan` | Create implementation plan for 3 Java files |
+| T4 | Implementation | `programmer` | Implement FieldVisibilityRules, ConditionFieldGroup, modify CobblemonTask |
+| T5 | Validation | `code-reviewer` | Review implementation for quality and patterns |
+
 ---
 
 ## Phase 3: Domain Model + Validation 🔲 PLANNED
