@@ -54,6 +54,13 @@ jobs:
               found {print}
             ' CHANGELOG.md)
 
+            # Extract release title from first bold item (e.g., "- **Action Picker UI**:" -> "Action Picker UI")
+            RELEASE_TITLE=$(echo "$CHANGELOG" | grep -m1 '^\- \*\*' | sed 's/^- \*\*\([^*]*\)\*\*.*/\1/' | xargs)
+            if [ -z "$RELEASE_TITLE" ]; then
+              RELEASE_TITLE="v$VERSION"
+            fi
+            echo "release_title=$RELEASE_TITLE" >> $GITHUB_OUTPUT
+
             # If changelog is empty, provide default message
             if [ -z "$CHANGELOG" ]; then
               CHANGELOG="See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details."
@@ -63,6 +70,7 @@ jobs:
             echo "$CHANGELOG" > changelog.txt
           else
             echo "See commit history for changes." > changelog.txt
+            echo "release_title=v$VERSION" >> $GITHUB_OUTPUT
           fi
 
       - name: Validate Gradle wrapper
@@ -81,7 +89,9 @@ jobs:
       - name: Publish to Modrinth
         run: |
           CHANGELOG_CONTENT=$(cat changelog.txt)
-          ./gradlew modrinth --no-daemon -Pmodrinth.changelog="$CHANGELOG_CONTENT"
+          ./gradlew modrinth --no-daemon \
+            -Pmodrinth.changelog="$CHANGELOG_CONTENT" \
+            -Pmodrinth.versionName="${{ steps.version.outputs.release_title }}"
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           MODRINTH_PROJECT_ID: ${{ secrets.MODRINTH_PROJECT_ID }}

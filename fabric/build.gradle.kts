@@ -97,7 +97,9 @@ modrinth {
 
     // Version configuration
     versionNumber.set("${project.version}-fabric")
-    versionName.set("v${project.version} (Fabric ${project.property("minecraft_version")})")
+    // Version name is set via -Pmodrinth.versionName in CI, fallback for local builds
+    versionName.set(project.findProperty("modrinth.versionName")?.toString()
+        ?: "v${project.version} (Fabric ${project.property("minecraft_version")})")
 
     // Release channel from environment or default to release
     versionType.set(System.getenv("RELEASE_CHANNEL") ?: "release")
