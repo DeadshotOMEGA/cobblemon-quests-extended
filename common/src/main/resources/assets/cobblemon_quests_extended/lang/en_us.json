@@ -1,5 +1,7 @@
 {
   "ftbquests.task.cobblemon_tasks.cobblemon_task": "Cobblemon Task",
+  "cobblemon_quests_extended.task.title": "Edit Cobblemon Task",
+  "cobblemon_quests_extended.task.update_fields": "Update Fields",
 
   "cobblemon_quests_extended.task.actions": "Actions",
   "cobblemon_quests_extended.task.pokemons": "Pokémon",

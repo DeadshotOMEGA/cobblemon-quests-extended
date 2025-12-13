@@ -6,6 +6,8 @@ import cobblemonquestsextended.cobblemon_quests_extended.integrations.megashowdo
 import cobblemonquestsextended.cobblemon_quests_extended.logger.CobblemonQuestsLogger;
 import cobblemonquestsextended.cobblemon_quests_extended.registry.ActionRegistry;
 import cobblemonquestsextended.cobblemon_quests_extended.tasks.PokemonTaskTypes;
+import dev.architectury.platform.Platform;
+import net.fabricmc.api.EnvType;
 
 import java.nio.file.Path;
 
@@ -27,6 +29,11 @@ public class CobblemonQuests {
         ActionRegistry.init();
         eventHandler = new CobblemonQuestsEventHandler().init();
         PokemonTaskTypes.init();
+
+        // Initialize client-side components (GuiProvider for dynamic field visibility)
+        if (Platform.getEnv() == EnvType.CLIENT) {
+            PokemonTaskTypes.initClient();
+        }
 
         // Initialize mod integrations (soft dependencies)
         MegaShowdownIntegration.init();
