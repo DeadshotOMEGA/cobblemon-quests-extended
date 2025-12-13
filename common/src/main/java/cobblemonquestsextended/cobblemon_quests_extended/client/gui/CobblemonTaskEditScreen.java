@@ -5,6 +5,7 @@ import cobblemonquestsextended.cobblemon_quests_extended.domain.CobblemonTaskMod
 import cobblemonquestsextended.cobblemon_quests_extended.domain.validation.TaskValidator;
 import cobblemonquestsextended.cobblemon_quests_extended.domain.validation.ValidationIssue;
 import cobblemonquestsextended.cobblemon_quests_extended.domain.validation.ValidationResult;
+import cobblemonquestsextended.cobblemon_quests_extended.preview.LivePreviewPanel;
 import dev.ftb.mods.ftblibrary.config.ConfigGroup;
 import dev.ftb.mods.ftblibrary.config.ConfigValue;
 import dev.ftb.mods.ftblibrary.config.ui.EditConfigScreen;
@@ -46,6 +47,11 @@ public class CobblemonTaskEditScreen extends EditConfigScreen {
     // Validation
     private final TaskValidator validator = new TaskValidator();
     private ValidationResult lastValidationResult = ValidationResult.valid();
+
+    // Live preview panel
+    private LivePreviewPanel previewPanel;
+    private static final int PREVIEW_PANEL_WIDTH = 220;
+    private static final int PREVIEW_PANEL_MARGIN = 10;
 
     // Button text components
     private static final Component ACCEPT_TEXT = Component.translatable("gui.accept");
@@ -113,6 +119,9 @@ public class CobblemonTaskEditScreen extends EditConfigScreen {
 
         // Run validation on current task state
         runValidation();
+
+        // Refresh preview panel with latest task state
+        refreshPreviewPanel();
     }
 
     /**
@@ -149,6 +158,35 @@ public class CobblemonTaskEditScreen extends EditConfigScreen {
         super.addWidgets();
         // Run initial validation
         runValidation();
+
+        // Add live preview panel on the right side
+        addPreviewPanel();
+    }
+
+    /**
+     * Adds the live preview panel to the right side of the screen.
+     */
+    private void addPreviewPanel() {
+        // Calculate position: right side of screen with margin
+        int panelX = width - PREVIEW_PANEL_WIDTH - PREVIEW_PANEL_MARGIN;
+        int panelY = 30; // Below title bar
+        int panelHeight = height - 80; // Leave room for bottom panel
+
+        previewPanel = new LivePreviewPanel(this, task);
+        previewPanel.setPosAndSize(panelX, panelY, PREVIEW_PANEL_WIDTH, panelHeight);
+        add(previewPanel);
+
+        CobblemonQuests.LOGGER.info("[EditScreen] Added preview panel at x={}, y={}, w={}, h={}",
+            panelX, panelY, PREVIEW_PANEL_WIDTH, panelHeight);
+    }
+
+    /**
+     * Refreshes the preview panel with current task state.
+     */
+    private void refreshPreviewPanel() {
+        if (previewPanel != null) {
+            previewPanel.refresh();
+        }
     }
 
     /**
