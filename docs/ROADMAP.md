@@ -7,7 +7,7 @@ This roadmap outlines the phased development plan for enhancing the quest creati
 | Phase | Name | Status | Risk | Timeline |
 |-------|------|--------|------|----------|
 | 1 | Foundation | ✅ Complete | LOW | v1.2.0 |
-| 2 | Smart Conditional Fields | 🔲 Planned | MODERATE | v1.3.0 |
+| 2 | Smart Conditional Fields | ✅ Complete | MODERATE | v1.3.0 |
 | 3 | Domain Model + Validation | 🔲 Planned | MODERATE | v1.4.0 |
 | 4 | Live Preview | 🔲 Planned | LOW | v1.5.0 |
 | 5 | Web Editor | 🔲 Planned | HIGH | v2.0.0 |
@@ -44,11 +44,12 @@ This roadmap outlines the phased development plan for enhancing the quest creati
 
 ---
 
-## Phase 2: Smart Conditional Fields 🔲 NEXT
+## Phase 2: Smart Conditional Fields ✅ COMPLETE
 
 **Goal:** Only show relevant condition fields based on selected action
 **Risk:** MODERATE
-**Target Version:** 1.3.0
+**Version:** 1.3.0
+**Status:** Released 2025-12-13
 
 ### Problem
 
@@ -107,13 +108,40 @@ public class FieldVisibilityRules {
 
 ### Execution Plan
 
-| Tier | Stage | Agent | Purpose |
-|------|-------|-------|---------|
-| T0 | Git Setup | `git-flow-manager` | Create feature/smart-conditional-fields branch |
-| T1 | Explore | `Explore` | Analyze CobblemonTask, ActionRegistry, FTB config system |
-| T3 | Planning | `Plan` | Create implementation plan for 3 Java files |
-| T4 | Implementation | `programmer` | Implement FieldVisibilityRules, ConditionFieldGroup, modify CobblemonTask |
-| T5 | Validation | `code-reviewer` | Review implementation for quality and patterns |
+| Tier | Stage | Agent | Purpose | Status |
+|------|-------|-------|---------|--------|
+| T0 | Git Setup | `git-flow-manager` | Create feature/smart-conditional-fields branch | ✅ |
+| T1 | Explore | `Explore` | Analyze CobblemonTask, ActionRegistry, FTB config system | ✅ |
+| T3 | Planning | `Plan` | Create implementation plan for 3 Java files | ✅ |
+| T4 | Implementation | `programmer` | Implement visibility rules in CobblemonTask | ✅ |
+| T5 | Validation | `code-reviewer` | Review implementation for quality and patterns | ✅ |
+| T6 | Debug | `Explore` | Investigate why fields weren't updating dynamically | ✅ |
+| T7 | Phase 3 Fix | Direct | Override onEditButtonClicked() for dynamic rebuild | ✅ |
+
+### Implementation Notes
+
+**Key Discovery:** FTB Library's ConfigGroup doesn't support dynamic field visibility after initialization. `fillConfigGroup()` is called once when the dialog opens.
+
+**Solution:** Override `onEditButtonClicked()` in CobblemonTask to:
+1. Capture initial `actions` state
+2. In the callback, detect if `actions` changed
+3. If changed, reopen the screen (triggering `fillConfigGroup()` with new state)
+4. If unchanged, proceed with normal save flow
+
+**Files Created:**
+- `client/gui/CobblemonTaskEditScreen.java` - Custom EditConfigScreen with dynamic "Update Fields" button
+- `tasks/CobblemonTaskGuiProvider.java` - Custom GuiProvider for new task creation flow
+
+**Files Modified:**
+- `CobblemonTask.java` - Added `onEditButtonClicked()` override, visibility helper methods, static Sets
+- `PokemonTaskTypes.java` - Added `initClient()` for GuiProvider registration
+- `CobblemonQuests.java` - Calls `initClient()` on client side
+- `en_us.json` - Added `task.title` and `task.update_fields` translation keys
+
+**User Experience:**
+- When user changes actions, the "Accept" button changes to "Update Fields"
+- Clicking "Update Fields" applies changes and reopens screen with updated conditional fields
+- Clear visual indication that field visibility has changed based on selected actions
 
 ---
 

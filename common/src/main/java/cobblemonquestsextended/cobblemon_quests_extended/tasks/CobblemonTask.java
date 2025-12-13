@@ -13,12 +13,15 @@ import com.cobblemon.mod.common.pokemon.Nature;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.cobblemon.mod.common.pokemon.Species;
 import cobblemonquestsextended.cobblemon_quests_extended.client.config.ConfigActionType;
+import dev.architectury.networking.NetworkManager;
 import dev.ftb.mods.ftblibrary.config.ConfigGroup;
 import dev.ftb.mods.ftblibrary.config.EnumConfig;
 import dev.ftb.mods.ftblibrary.config.NameMap;
 import dev.ftb.mods.ftblibrary.config.StringConfig;
+import dev.ftb.mods.ftblibrary.config.ui.EditConfigScreen;
 import dev.ftb.mods.ftblibrary.icon.Icon;
 import dev.ftb.mods.ftblibrary.icon.ItemIcon;
+import dev.ftb.mods.ftbquests.net.EditObjectMessage;
 import dev.ftb.mods.ftbquests.quest.Quest;
 import dev.ftb.mods.ftbquests.quest.TeamData;
 import dev.ftb.mods.ftbquests.quest.task.Task;
@@ -72,6 +75,18 @@ public class CobblemonTask extends Task {
     public ArrayList<String> megaForms = new ArrayList<>();
     public ArrayList<String> zCrystals = new ArrayList<>();
     public ArrayList<String> dynamaxTypes = new ArrayList<>();
+
+    // Static sets for field visibility rules (Phase 2)
+    private static final Set<String> CATCH_BATTLE_ACTIONS = Set.of(
+        "catch", "obtain", "revive_fossil", "reel", "hatch_egg", "select_starter",
+        "defeat", "defeat_player", "defeat_npc", "kill", "faint_pokemon"
+    );
+
+    private static final Set<String> FORM_RELATED_ACTIONS = Set.of(
+        "catch", "obtain", "revive_fossil", "reel", "select_starter", "hatch_egg",
+        "evolve", "evolve_into", "change_form",
+        "register", "have_registered", "scan"
+    );
 
     public CobblemonTask(long id, Quest quest) {
         super(id, quest);
@@ -230,55 +245,284 @@ public class CobblemonTask extends Task {
         return Arrays.stream(s.split(",")).map(String::trim).filter(obj -> !obj.isEmpty() && !obj.contains("choice_any")).distinct().collect(Collectors.toCollection(ArrayList::new));
     }
 
+    /**
+     * Phase 3: Dynamic field visibility - reopens config screen when actions change.
+     *
+     * Uses custom CobblemonTaskEditScreen that changes the Accept button to "Update Fields"
+     * when actions are modified, providing clear UX for the field rebuild feature.
+     */
+    @Override
+    @Environment(EnvType.CLIENT)
+    public void onEditButtonClicked(Runnable gui) {
+        // Create config group with save callback
+        ConfigGroup group = new ConfigGroup(MOD_ID, accepted -> {
+            gui.run();
+
+            if (!accepted) {
+                return; // User cancelled - do nothing
+            }
+
+            // Normal save flow
+            if (validateEditedConfig()) {
+                NetworkManager.sendToServer(EditObjectMessage.forQuestObject(this));
+            }
+        }) {
+            @Override
+            public Component getName() {
+                return Component.translatable(MOD_ID + ".task.title");
+            }
+        };
+
+        // Populate config fields using Phase 2 conditional logic
+        fillConfigGroup(createSubGroup(group));
+
+        // Open custom edit screen with dynamic button behavior
+        // When actions change, "Accept" becomes "Update Fields" and reopens the screen
+        new cobblemonquestsextended.cobblemon_quests_extended.client.gui.CobblemonTaskEditScreen(
+            group, this, () -> onEditButtonClicked(gui)
+        ).openGui();
+    }
+
     @Override
     @Environment(EnvType.CLIENT)
     public void fillConfigGroup(ConfigGroup config) {
         super.fillConfigGroup(config);
-        // Asserts that the client is in a world, something that always should be true when the config is opened.
+
+        // Assert that the client is in a world (should always be true when config opens)
         assert Minecraft.getInstance().level != null;
         RegistryAccess registryManager = Minecraft.getInstance().level.registryAccess();
-        // Use ConfigActionType for rich action selection UI with categories and tooltips
-        config.addList("actions", actions, new ConfigActionType(), "catch").setNameKey(MOD_ID + ".task.actions");
-        Function<String, String> pokemonNameProcessor = (name) -> name.replace(":", ".species.") + ".name";
-        List<String> pokemonList = PokemonSpecies.getSpecies().stream().map(species -> species.resourceIdentifier.toString())
-                .sorted().collect(Collectors.toCollection(() -> new ArrayList<>(PokemonSpecies.getSpecies().size() + 1)));
-        pokemonList.add("cobblemon_quests"); // Done to bypass an issue where the last pokemon cannot be selected
+
+        // Prepare common processor functions
+        Function<String, String> pokemonNameProcessor = (name) ->
+            name.replace(":", ".species.") + ".name";
+        Function<String, String> pokemonTypeNameProcessor = (name) ->
+            "cobblemon.type." + name;
+
+        // ===== SECTION 1: ACTION SELECTION =====
+        // Always shown - user must select at least one action
+        config.addList("actions", actions, new ConfigActionType(), "catch")
+            .setNameKey(MOD_ID + ".task.actions");
+
+        // ===== SECTION 2: BASIC CONDITIONS =====
+        // These fields are always shown (quantity, shiny, species, type, nature, region)
+        addBasicConditionFields(config, registryManager, pokemonNameProcessor, pokemonTypeNameProcessor);
+
+        // ===== SECTION 3: CONDITIONAL SECTIONS BASED ON SELECTED ACTIONS =====
+
+        // Level restrictions - only for level_up / level_up_to actions
+        if (shouldShowLevelFields()) {
+            addLevelFields(config);
+        }
+
+        // Pokedex progress - only for register / have_registered / scan actions
+        if (shouldShowDexProgressField()) {
+            addDexProgressField(config);
+        }
+
+        // Time and location - only for catch/battle actions
+        if (shouldShowTimeLocationFields()) {
+            addTimeLocationFields(config, registryManager);
+        }
+
+        // Form/variant filters - for evolution and form-related actions
+        if (shouldShowFormFields()) {
+            addFormFields(config);
+        }
+
+        // Gender filters - mostly always shown, but here for clarity
+        if (shouldShowGenderFields()) {
+            addGenderFields(config);
+        }
+
+        // ===== SECTION 4: GIMMICK-SPECIFIC FIELDS =====
+        // These only appear when specific gimmick actions are selected
+        addGimmickFields(config, pokemonTypeNameProcessor);
+    }
+
+    // ===== VISIBILITY HELPER METHODS =====
+
+    /**
+     * Checks if any selected action requires level restrictions.
+     * Used to conditionally show min_level and max_level fields.
+     */
+    private boolean shouldShowLevelFields() {
+        return actions.contains("level_up") || actions.contains("level_up_to");
+    }
+
+    /**
+     * Checks if any selected action involves pokedex/dex progress tracking.
+     * Used to conditionally show dex_progress field (seen vs caught).
+     */
+    private boolean shouldShowDexProgressField() {
+        return actions.contains("register")
+            || actions.contains("have_registered")
+            || actions.contains("scan");
+    }
+
+    /**
+     * Checks if any selected action is time/location dependent.
+     * Catching and battle actions benefit from time and location filters.
+     */
+    private boolean shouldShowTimeLocationFields() {
+        return actions.stream().anyMatch(CATCH_BATTLE_ACTIONS::contains);
+    }
+
+    /**
+     * Checks if a specific gimmick action is selected.
+     * Used for mega_evolve, terastallize, use_z_move, dynamax actions.
+     */
+    private boolean shouldShowGimmickFields(String gimmickAction) {
+        return actions.contains(gimmickAction);
+    }
+
+    /**
+     * Checks if form/variant filtering should be shown.
+     * Catch, evolution, and pokedex actions support form filtering.
+     */
+    private boolean shouldShowFormFields() {
+        return actions.stream().anyMatch(FORM_RELATED_ACTIONS::contains);
+    }
+
+    /**
+     * Checks if gender filtering should be shown.
+     * Useful for tasks requiring specific gender Pokemon.
+     */
+    private boolean shouldShowGenderFields() {
+        // Most actions can filter by gender, show for flexibility
+        return !actions.isEmpty();
+    }
+
+    // ===== CONFIG BUILDING HELPER METHODS =====
+
+    /**
+     * Adds basic condition fields that are always shown regardless of action.
+     * Includes: amount, shiny, pokemons, pokemon_types, natures, regions
+     */
+    private void addBasicConditionFields(ConfigGroup config, RegistryAccess registryManager,
+            Function<String, String> pokemonNameProcessor,
+            Function<String, String> pokemonTypeNameProcessor) {
+
+        config.addLong("amount", amount, v -> amount = v, 1L, 1L, Long.MAX_VALUE)
+            .setNameKey(MOD_ID + ".task.amount");
+
+        config.addBool("shiny", shiny, v -> shiny = v, false)
+            .setNameKey(MOD_ID + ".task.shiny");
+
+        List<String> pokemonList = PokemonSpecies.getSpecies().stream()
+            .map(species -> species.resourceIdentifier.toString())
+            .sorted()
+            .collect(Collectors.toCollection(() -> new ArrayList<>(PokemonSpecies.getSpecies().size() + 1)));
+        pokemonList.add("cobblemon_quests"); // Bypass last-item selection issue
         addConfigList(config, "pokemons", pokemons, pokemonList, this::getPokemonIcon, pokemonNameProcessor);
-        config.addLong("amount", amount, v -> amount = v, 1L, 1L, Long.MAX_VALUE).setNameKey(MOD_ID + ".task.amount");
-        config.addBool("shiny", shiny, v -> shiny = v, false).setNameKey(MOD_ID + ".task.shiny");
-        Function<String, String> pokeBallNameProcessor = (name) -> "item." + name.replace(":", ".");
-        List<String> pokeBallList = PokeBalls.all().stream().map(pokeBall -> pokeBall.getName().toString())
-                .sorted().collect(Collectors.toCollection(() -> new ArrayList<>(PokeBalls.all().size() + 1)));
-        pokeBallList.add("cobblemon_quests");
-        addConfigList(config, "pokeballs", pokeBallsUsed, pokeBallList, this::getIconFromIdentifier, pokeBallNameProcessor);
-        addConfigList(config, "forms", forms, formList, null, null);
-        addConfigList(config, "genders", genders, genderList, null, null);
-        Function<String, String> pokemonTypeNameProcessor = (name) -> "cobblemon.type." + name;
+
         addConfigList(config, "pokemon_types", pokemonTypes, pokemonTypeList, null, pokemonTypeNameProcessor);
+
+        List<String> natureList = Natures.all().stream()
+            .map(Nature::getDisplayName)
+            .toList();
+        addConfigList(config, "natures", natures, natureList, null, s -> s);
+
         addConfigList(config, "regions", regions, regionList, null, null);
-        Function<String, String> biomeAndDimensionNameProcessor = (name) -> "(" + name.replace("_", " ").replace(":", ") ");
-        List<String> biomeList = registryManager.registryOrThrow(Registries.BIOME).entrySet().stream().map(entry -> entry.getKey().location().toString()).toList();
+    }
+
+    /**
+     * Adds level restriction fields (min_level, max_level).
+     * Only shown when level_up or level_up_to actions are selected.
+     */
+    private void addLevelFields(ConfigGroup config) {
+        config.addInt("min_level", minLevel, v -> minLevel = v, 0, 0, Integer.MAX_VALUE)
+            .setNameKey(MOD_ID + ".task.min_level");
+
+        config.addInt("max_level", maxLevel, v -> maxLevel = v, 0, 0, Integer.MAX_VALUE)
+            .setNameKey(MOD_ID + ".task.max_level");
+    }
+
+    /**
+     * Adds dex progress field (seen vs caught).
+     * Only shown when pokedex-related actions are selected.
+     */
+    private void addDexProgressField(ConfigGroup config) {
+        List<String> dexProgressList = List.of("caught", "seen");
+        config.addEnum("dex_progress", dexProgress, v -> dexProgress = v,
+            NameMap.of(dexProgress, dexProgressList)
+                .nameKey(v -> "cobblemon_quests.dex_progress." + v)
+                .create(), dexProgress)
+            .setNameKey(MOD_ID + ".task.dex_progress");
+    }
+
+    /**
+     * Adds time and location restriction fields.
+     * Only shown when catch or battle actions are selected.
+     */
+    private void addTimeLocationFields(ConfigGroup config, RegistryAccess registryManager) {
+        config.addLong("time_min", timeMin, v -> timeMin = v, 0L, 0L, 24000L)
+            .setNameKey(MOD_ID + ".task.time_min");
+
+        config.addLong("time_max", timeMax, v -> timeMax = v, 24000L, 0L, 24000L)
+            .setNameKey(MOD_ID + ".task.time_max");
+
+        Function<String, String> biomeAndDimensionNameProcessor = (name) ->
+            "(" + name.replace("_", " ").replace(":", ") ");
+
+        List<String> biomeList = registryManager.registryOrThrow(Registries.BIOME)
+            .entrySet().stream()
+            .map(entry -> entry.getKey().location().toString())
+            .toList();
         addConfigList(config, "biomes", biomes, biomeList, null, biomeAndDimensionNameProcessor);
-        ArrayList<String> dimensionList = new ArrayList<>(registryManager.registryOrThrow(Registries.DIMENSION_TYPE).entrySet().stream().map(entry -> entry.getKey().location().toString()).toList());
+
+        ArrayList<String> dimensionList = new ArrayList<>(
+            registryManager.registryOrThrow(Registries.DIMENSION_TYPE)
+                .entrySet().stream()
+                .map(entry -> entry.getKey().location().toString())
+                .toList());
         dimensionList.remove("minecraft:overworld_caves");
         addConfigList(config, "dimensions", dimensions, dimensionList, null, biomeAndDimensionNameProcessor);
-        config.addLong("time_min", timeMin, v -> timeMin = v, 0L, 0L, 24000L).setNameKey(MOD_ID + ".task.time_min");
-        config.addLong("time_max", timeMax, v -> timeMax = v, 24000L, 0L, 24000L).setNameKey(MOD_ID + ".task.time_max");
-        config.addInt("min_level", minLevel, v -> minLevel = v, 0, 0, Integer.MAX_VALUE).setNameKey(MOD_ID + ".task.min_level");
-        config.addInt("max_level", maxLevel, v -> maxLevel = v, 0, 0, Integer.MAX_VALUE).setNameKey(MOD_ID + ".task.max_level");
 
-        List<String> dexProgressList = List.of("caught", "seen");
-        config.addEnum("dex_progress", dexProgress, v -> dexProgress = v, NameMap.of(dexProgress, dexProgressList)
-                .nameKey(v -> "cobblemon_quests.dex_progress." + v)
-                .create(), dexProgress).setNameKey(MOD_ID + ".task.dex_progress");
+        Function<String, String> pokeBallNameProcessor = (name) -> "item." + name.replace(":", ".");
+        List<String> pokeBallList = PokeBalls.all().stream()
+            .map(pokeBall -> pokeBall.getName().toString())
+            .sorted()
+            .collect(Collectors.toCollection(() -> new ArrayList<>(PokeBalls.all().size() + 1)));
+        pokeBallList.add("cobblemon_quests");
+        addConfigList(config, "pokeballs", pokeBallsUsed, pokeBallList, this::getIconFromIdentifier, pokeBallNameProcessor);
+    }
 
-        List<String> natureList = Natures.all().stream().map(Nature::getDisplayName).toList();
-        addConfigList(config, "natures", natures, natureList, null, s -> s);
-        // New extended condition config options
-        addConfigList(config, "tera_types", teraTypes, teraTypeList, null, pokemonTypeNameProcessor);
-        addConfigList(config, "mega_forms", megaForms, megaFormList, null, null);
-        addConfigList(config, "z_crystals", zCrystals, zCrystalList, null, null);
-        addConfigList(config, "dynamax_types", dynamaxTypes, dynamaxTypeList, null, null);
+    /**
+     * Adds form/variant filtering fields.
+     * Shown when evolution or form-related actions are selected.
+     */
+    private void addFormFields(ConfigGroup config) {
+        addConfigList(config, "forms", forms, formList, null, null);
+    }
+
+    /**
+     * Adds gender filtering fields.
+     */
+    private void addGenderFields(ConfigGroup config) {
+        addConfigList(config, "genders", genders, genderList, null, null);
+    }
+
+    /**
+     * Adds gimmick-specific condition fields.
+     * Mega Evolution, Terastallization, Z-Moves, Dynamax, etc.
+     */
+    private void addGimmickFields(ConfigGroup config, Function<String, String> pokemonTypeNameProcessor) {
+        if (shouldShowGimmickFields("mega_evolve")) {
+            addConfigList(config, "mega_forms", megaForms, megaFormList, null, null);
+        }
+
+        if (shouldShowGimmickFields("terastallize")) {
+            addConfigList(config, "tera_types", teraTypes, teraTypeList, null, pokemonTypeNameProcessor);
+        }
+
+        if (shouldShowGimmickFields("use_z_move")) {
+            addConfigList(config, "z_crystals", zCrystals, zCrystalList, null, null);
+        }
+
+        if (shouldShowGimmickFields("dynamax") || shouldShowGimmickFields("gigantamax")
+                || shouldShowGimmickFields("ultra_burst")) {
+            addConfigList(config, "dynamax_types", dynamaxTypes, dynamaxTypeList, null, null);
+        }
     }
 
     private void addConfigList(ConfigGroup config, String listName, List<String> listData, List<String> optionsList, Function<ResourceLocation, Icon> iconProcessor, Function<String, String> nameProcessor) {
