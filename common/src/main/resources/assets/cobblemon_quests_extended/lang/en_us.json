@@ -1,6 +1,9 @@
 {
   "ftbquests.task.cobblemon_tasks.cobblemon_task": "Cobblemon Task",
   "cobblemon_quests_extended.task.title": "Edit Cobblemon Task",
+  "cobblemon_quests_extended.task": "Task",
+  "cobblemon_quests_extended.task.cobblemon_tasks": "Cobblemon Quests",
+  "cobblemon_quests_extended.task.cobblemon_tasks.cobblemon_task": "Cobblemon Task",
   "cobblemon_quests_extended.task.update_fields": "Update Fields",
 
   "cobblemon_quests_extended.task.actions": "Actions",
@@ -24,6 +27,15 @@
   "cobblemon_quests_extended.task.mega_forms": "Mega Forms",
   "cobblemon_quests_extended.task.z_crystals": "Z-Crystals",
   "cobblemon_quests_extended.task.dynamax_types": "Dynamax Types",
+
+  "cobblemon_quests_extended.config.root": "Task",
+  "cobblemon_quests_extended.config.group.action": "Action",
+  "cobblemon_quests_extended.config.group.pokemon": "Pokémon",
+  "cobblemon_quests_extended.config.group.level": "Level",
+  "cobblemon_quests_extended.config.group.location": "Location",
+  "cobblemon_quests_extended.config.group.capture": "Capture",
+  "cobblemon_quests_extended.config.group.pokedex": "Pokédex",
+  "cobblemon_quests_extended.config.group.gimmicks": "Gimmicks",
 
   "cobblemon_quests_extended.task.actions.tooltip": "The actions the player must perform to complete the task.",
   "cobblemon_quests_extended.task.pokemons.tooltip": "The possible Pokémon the player can interact with to complete the task. If the list is empty, any Pokémon counts towards the task.",
@@ -56,8 +68,12 @@
   "cobblemon_quests_extended.gui.action.category": "Category: %s",
   "cobblemon_quests_extended.gui.action_count": "%d actions",
   "cobblemon_quests_extended.gui.click_to_toggle": "Click to expand/collapse",
+  "cobblemon_quests_extended.gui.item_count": "%d items",
+  "cobblemon_quests_extended.gui.selected": "Selected",
   "cobblemon_quests_extended.config.category": "Category",
   "cobblemon_quests_extended.config.requires_pokemon": "Requires Pokémon",
+  "cobblemon_quests_extended.config.generation": "Generation",
+  "cobblemon_quests_extended.config.dimension_id": "Dimension ID",
 
   "cobblemon_quests_extended.actions.catch": "Catch",
   "cobblemon_quests_extended.actions.catch.desc": "Triggers when successfully catching a wild Pokémon with a Poké Ball.",
@@ -249,6 +265,9 @@
 
   "cobblemon_quests_extended.dynamax_types.dynamax": "Dynamax",
   "cobblemon_quests_extended.dynamax_types.gigantamax": "Gigantamax",
+  "cobblemon_quests_extended.dynamax_types.dynamax.desc": "Standard Dynamax transformation",
+  "cobblemon_quests_extended.dynamax_types.gigantamax.desc": "Special Gigantamax transformation",
+  "cobblemon_quests_extended.dynamax_types.gigantamax.special": "Changes appearance and signature G-Max Move",
   "cobblemon_quests_extended.dynamax_types.": "",
 
   "cobblemon_quests_extended.z_crystals.normalium-z": "Normalium Z",
@@ -286,6 +305,10 @@
   "cobblemon_quests_extended.z_crystals.solganium-z": "Solganium Z",
   "cobblemon_quests_extended.z_crystals.tapunium-z": "Tapunium Z",
   "cobblemon_quests_extended.z_crystals.ultranecrozium-z": "Ultranecrozium Z",
+  "cobblemon_quests_extended.z_crystals.section.type": "Type Z-Crystals",
+  "cobblemon_quests_extended.z_crystals.section.pokemon": "Pokémon Z-Crystals",
+  "cobblemon_quests_extended.z_crystals.desc": "Enables a powerful Z-Move",
+  "cobblemon_quests_extended.z_crystals.pokemon_specific": "Exclusive to specific Pokémon",
   "cobblemon_quests_extended.z_crystals.": "",
 
   "cobblemon_quests_extended.dex_progress.seen": "Seen",
@@ -314,6 +337,7 @@
   "cobblemon_quests_extended.validation.many_filters": "Many specific Pokémon with type filters may be overly restrictive",
 
   "cobblemon_quests_extended.gui.select_pokemon": "Select Pokémon",
+  "cobblemon_quests_extended.pokemon_list.all": "All Pokémon",
   "cobblemon_quests_extended.gui.select_type": "Select Type",
   "cobblemon_quests_extended.gui.select_nature": "Select Nature",
   "cobblemon_quests_extended.gui.select_biome": "Select Biome",
@@ -324,6 +348,8 @@
   "cobblemon_quests_extended.gui.select_tera_type": "Select Tera Type",
   "cobblemon_quests_extended.gui.select_pokeball": "Select Poké Ball",
   "cobblemon_quests_extended.gui.select_form": "Select Form",
+  "cobblemon_quests_extended.gui.select_dynamax_type": "Select Dynamax Type",
+  "cobblemon_quests_extended.gui.select_z_crystal": "Select Z-Crystal",
 
   "cobblemon_quests_extended.generation.gen_1": "Gen 1 (Kanto)",
   "cobblemon_quests_extended.generation.gen_2": "Gen 2 (Johto)",
@@ -346,6 +372,8 @@
   "cobblemon_quests_extended.biome_category.ocean": "Ocean",
   "cobblemon_quests_extended.biome_category.swamp": "Swamp",
   "cobblemon_quests_extended.biome_category.cave": "Cave",
+  "cobblemon_quests_extended.biome_category.jungle": "Jungle",
+  "cobblemon_quests_extended.biome_category.tundra": "Tundra",
   "cobblemon_quests_extended.biome_category.nether": "Nether",
   "cobblemon_quests_extended.biome_category.end": "End",
   "cobblemon_quests_extended.biome_category.other": "Other",
@@ -355,6 +383,11 @@
   "cobblemon_quests_extended.nature_category.special": "Special",
   "cobblemon_quests_extended.nature_category.speed": "Speed",
   "cobblemon_quests_extended.nature_category.defensive": "Defensive",
+  "cobblemon_quests_extended.nature_category.attack_up": "Physical (+Atk)",
+  "cobblemon_quests_extended.nature_category.defense_up": "Defensive (+Def)",
+  "cobblemon_quests_extended.nature_category.sp_atk_up": "Special (+SpA)",
+  "cobblemon_quests_extended.nature_category.sp_def_up": "Defensive (+SpD)",
+  "cobblemon_quests_extended.nature_category.speed_up": "Speed (+Spe)",
 
   "cobblemon_quests_extended.form_category.regional": "Regional Forms",
   "cobblemon_quests_extended.form_category.mega": "Mega Forms",
@@ -394,6 +427,8 @@
   "cobblemon_quests_extended.ball_category.other": "Other",
 
   "cobblemon_quests_extended.tera_type.stellar": "Stellar",
+  "cobblemon_quests_extended.tera_type.desc": "Terastallizes the Pokémon to this type",
+  "cobblemon_quests_extended.tera_type.stellar.desc": "Boosts all types during Terastallization",
 
   "cobblemon_quests_extended.preview.title": "Quest Preview",
   "cobblemon_quests_extended.preview.errors": "ERRORS",

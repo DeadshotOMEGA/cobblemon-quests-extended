@@ -259,7 +259,8 @@ public class CobblemonTask extends Task {
     @Environment(EnvType.CLIENT)
     public void onEditButtonClicked(Runnable gui) {
         // Create config group with save callback
-        ConfigGroup group = new ConfigGroup(MOD_ID, accepted -> {
+        // Use short id "task" to keep breadcrumbs short (e.g., "Task → Action" not "cobblemon_quests_extended → Action")
+        ConfigGroup group = new ConfigGroup("task", accepted -> {
             gui.run();
 
             if (!accepted) {
@@ -275,10 +276,15 @@ public class CobblemonTask extends Task {
             public Component getName() {
                 return Component.translatable(MOD_ID + ".task.title");
             }
+
+            @Override
+            public String getNameKey() {
+                return MOD_ID + ".config.root";
+            }
         };
 
-        // Populate config fields using Phase 2 conditional logic
-        fillConfigGroup(createSubGroup(group));
+        // Populate config fields directly (skip createSubGroup to avoid deep breadcrumb nesting)
+        fillConfigGroup(group);
 
         // Open custom edit screen with dynamic button behavior
         // When actions change, "Accept" becomes "Update Fields" and reopens the screen
@@ -292,45 +298,126 @@ public class CobblemonTask extends Task {
     public void fillConfigGroup(ConfigGroup config) {
         super.fillConfigGroup(config);
 
-        // ===== SECTION 1: ACTION SELECTION =====
-        // Always shown - user must select at least one action
-        config.addList("actions", actions, new ConfigActionType(), "catch")
+        // ===== GROUP 1: ACTION (always shown) =====
+        ConfigGroup actionGroup = config.getOrCreateSubgroup("action")
+            .setNameKey(MOD_ID + ".config.group.action");
+
+        actionGroup.addList("actions", actions, new ConfigActionType(), "catch")
             .setNameKey(MOD_ID + ".task.actions");
 
-        // ===== SECTION 2: BASIC CONDITIONS =====
-        // These fields are always shown (quantity, shiny, species, type, nature, region)
-        addBasicConditionFields(config);
+        actionGroup.addLong("amount", amount, v -> amount = v, 1L, 1L, Long.MAX_VALUE)
+            .setNameKey(MOD_ID + ".task.amount");
 
-        // ===== SECTION 3: CONDITIONAL SECTIONS BASED ON SELECTED ACTIONS =====
-
-        // Level restrictions - only for level_up / level_up_to actions
-        if (shouldShowLevelFields()) {
-            addLevelFields(config);
+        // Only show remaining groups if at least one action is selected
+        if (actions.isEmpty()) {
+            return;
         }
 
-        // Pokedex progress - only for register / have_registered / scan actions
-        if (shouldShowDexProgressField()) {
-            addDexProgressField(config);
-        }
+        // ===== GROUP 2: POKEMON (species, types, properties) =====
+        ConfigGroup pokemonGroup = config.getOrCreateSubgroup("pokemon")
+            .setNameKey(MOD_ID + ".config.group.pokemon");
 
-        // Time and location - only for catch/battle actions
-        if (shouldShowTimeLocationFields()) {
-            addTimeLocationFields(config);
-        }
+        pokemonGroup.addList("pokemons", pokemons, new ConfigPokemonType(), "")
+            .setNameKey(MOD_ID + ".task.pokemons");
 
-        // Form/variant filters - for evolution and form-related actions
+        pokemonGroup.addList("pokemon_types", pokemonTypes, new ConfigTypeSelector(), "")
+            .setNameKey(MOD_ID + ".task.pokemon_types");
+
         if (shouldShowFormFields()) {
-            addFormFields(config);
+            pokemonGroup.addList("forms", forms, new ConfigFormType(), "")
+                .setNameKey(MOD_ID + ".task.forms");
         }
 
-        // Gender filters - mostly always shown, but here for clarity
-        if (shouldShowGenderFields()) {
-            addGenderFields(config);
+        pokemonGroup.addList("genders", genders, new ConfigGenderType(), "")
+            .setNameKey(MOD_ID + ".task.genders");
+
+        pokemonGroup.addList("natures", natures, new ConfigNatureType(), "")
+            .setNameKey(MOD_ID + ".task.natures");
+
+        pokemonGroup.addList("regions", regions, new ConfigRegionType(), "")
+            .setNameKey(MOD_ID + ".task.regions");
+
+        pokemonGroup.addBool("shiny", shiny, v -> shiny = v, false)
+            .setNameKey(MOD_ID + ".task.shiny");
+
+        // ===== GROUP 3: LEVEL (conditional - level_up actions) =====
+        if (shouldShowLevelFields()) {
+            ConfigGroup levelGroup = config.getOrCreateSubgroup("level")
+                .setNameKey(MOD_ID + ".config.group.level");
+
+            levelGroup.addInt("min_level", minLevel, v -> minLevel = v, 0, 0, Integer.MAX_VALUE)
+                .setNameKey(MOD_ID + ".task.min_level");
+
+            levelGroup.addInt("max_level", maxLevel, v -> maxLevel = v, 0, 0, Integer.MAX_VALUE)
+                .setNameKey(MOD_ID + ".task.max_level");
         }
 
-        // ===== SECTION 4: GIMMICK-SPECIFIC FIELDS =====
-        // These only appear when specific gimmick actions are selected
-        addGimmickFields(config);
+        // ===== GROUP 4: LOCATION (conditional - catch/battle actions) =====
+        if (shouldShowTimeLocationFields()) {
+            ConfigGroup locationGroup = config.getOrCreateSubgroup("location")
+                .setNameKey(MOD_ID + ".config.group.location");
+
+            locationGroup.addList("biomes", biomes, new ConfigBiomeType(), "")
+                .setNameKey(MOD_ID + ".task.biomes");
+
+            locationGroup.addList("dimensions", dimensions, new ConfigDimensionType(), "")
+                .setNameKey(MOD_ID + ".task.dimensions");
+
+            locationGroup.addLong("time_min", timeMin, v -> timeMin = v, 0L, 0L, 24000L)
+                .setNameKey(MOD_ID + ".task.time_min");
+
+            locationGroup.addLong("time_max", timeMax, v -> timeMax = v, 24000L, 0L, 24000L)
+                .setNameKey(MOD_ID + ".task.time_max");
+        }
+
+        // ===== GROUP 5: CAPTURE (conditional - catch/battle actions) =====
+        if (shouldShowTimeLocationFields()) {
+            ConfigGroup captureGroup = config.getOrCreateSubgroup("capture")
+                .setNameKey(MOD_ID + ".config.group.capture");
+
+            captureGroup.addList("pokeballs", pokeBallsUsed, new ConfigPokeBallType(), "")
+                .setNameKey(MOD_ID + ".task.pokeballs");
+        }
+
+        // ===== GROUP 6: POKEDEX (conditional - register/scan actions) =====
+        if (shouldShowDexProgressField()) {
+            ConfigGroup pokedexGroup = config.getOrCreateSubgroup("pokedex")
+                .setNameKey(MOD_ID + ".config.group.pokedex");
+
+            List<String> dexProgressList = List.of("caught", "seen");
+            pokedexGroup.addEnum("dex_progress", dexProgress, v -> dexProgress = v,
+                NameMap.of(dexProgress, dexProgressList)
+                    .nameKey(v -> "cobblemon_quests.dex_progress." + v)
+                    .create(), dexProgress)
+                .setNameKey(MOD_ID + ".task.dex_progress");
+        }
+
+        // ===== GROUP 7: GIMMICKS (conditional - gimmick actions) =====
+        if (hasAnyGimmickAction()) {
+            ConfigGroup gimmickGroup = config.getOrCreateSubgroup("gimmicks")
+                .setNameKey(MOD_ID + ".config.group.gimmicks");
+
+            if (shouldShowGimmickFields("mega_evolve")) {
+                gimmickGroup.addList("mega_forms", megaForms, new ConfigMegaFormType(), "")
+                    .setNameKey(MOD_ID + ".task.mega_forms");
+            }
+
+            if (shouldShowGimmickFields("terastallize")) {
+                gimmickGroup.addList("tera_types", teraTypes, new ConfigTeraType(), "")
+                    .setNameKey(MOD_ID + ".task.tera_types");
+            }
+
+            if (shouldShowGimmickFields("use_z_move")) {
+                gimmickGroup.addList("z_crystals", zCrystals, new ConfigZCrystalType(), "")
+                    .setNameKey(MOD_ID + ".task.z_crystals");
+            }
+
+            if (shouldShowGimmickFields("dynamax") || shouldShowGimmickFields("gigantamax")
+                    || shouldShowGimmickFields("ultra_burst")) {
+                gimmickGroup.addList("dynamax_types", dynamaxTypes, new ConfigDynamaxType(), "")
+                    .setNameKey(MOD_ID + ".task.dynamax_types");
+            }
+        }
     }
 
     // ===== VISIBILITY HELPER METHODS =====
@@ -378,141 +465,15 @@ public class CobblemonTask extends Task {
     }
 
     /**
-     * Checks if gender filtering should be shown.
-     * Useful for tasks requiring specific gender Pokemon.
+     * Checks if any gimmick-related action is selected.
      */
-    private boolean shouldShowGenderFields() {
-        // Most actions can filter by gender, show for flexibility
-        return !actions.isEmpty();
-    }
-
-    // ===== CONFIG BUILDING HELPER METHODS =====
-
-    /**
-     * Adds basic condition fields that are always shown regardless of action.
-     * Includes: amount, shiny, pokemons, pokemon_types, natures, regions
-     */
-    private void addBasicConditionFields(ConfigGroup config) {
-        config.addLong("amount", amount, v -> amount = v, 1L, 1L, Long.MAX_VALUE)
-            .setNameKey(MOD_ID + ".task.amount");
-
-        config.addBool("shiny", shiny, v -> shiny = v, false)
-            .setNameKey(MOD_ID + ".task.shiny");
-
-        // Pokemon list with ConfigPokemonType for species selection
-        config.addList("pokemons", pokemons, new ConfigPokemonType(), "")
-            .setNameKey(MOD_ID + ".task.pokemons");
-
-        // Pokemon types with ConfigTypeSelector for type filtering
-        config.addList("pokemon_types", pokemonTypes, new ConfigTypeSelector(), "")
-            .setNameKey(MOD_ID + ".task.pokemon_types");
-
-        // Natures with ConfigNatureType
-        config.addList("natures", natures, new ConfigNatureType(), "")
-            .setNameKey(MOD_ID + ".task.natures");
-
-        // Regions with ConfigRegionType
-        config.addList("regions", regions, new ConfigRegionType(), "")
-            .setNameKey(MOD_ID + ".task.regions");
-    }
-
-    /**
-     * Adds level restriction fields (min_level, max_level).
-     * Only shown when level_up or level_up_to actions are selected.
-     */
-    private void addLevelFields(ConfigGroup config) {
-        config.addInt("min_level", minLevel, v -> minLevel = v, 0, 0, Integer.MAX_VALUE)
-            .setNameKey(MOD_ID + ".task.min_level");
-
-        config.addInt("max_level", maxLevel, v -> maxLevel = v, 0, 0, Integer.MAX_VALUE)
-            .setNameKey(MOD_ID + ".task.max_level");
-    }
-
-    /**
-     * Adds dex progress field (seen vs caught).
-     * Only shown when pokedex-related actions are selected.
-     */
-    private void addDexProgressField(ConfigGroup config) {
-        List<String> dexProgressList = List.of("caught", "seen");
-        config.addEnum("dex_progress", dexProgress, v -> dexProgress = v,
-            NameMap.of(dexProgress, dexProgressList)
-                .nameKey(v -> "cobblemon_quests.dex_progress." + v)
-                .create(), dexProgress)
-            .setNameKey(MOD_ID + ".task.dex_progress");
-    }
-
-    /**
-     * Adds time and location restriction fields.
-     * Only shown when catch or battle actions are selected.
-     */
-    private void addTimeLocationFields(ConfigGroup config) {
-        config.addLong("time_min", timeMin, v -> timeMin = v, 0L, 0L, 24000L)
-            .setNameKey(MOD_ID + ".task.time_min");
-
-        config.addLong("time_max", timeMax, v -> timeMax = v, 24000L, 0L, 24000L)
-            .setNameKey(MOD_ID + ".task.time_max");
-
-        // Biomes with ConfigBiomeType
-        config.addList("biomes", biomes, new ConfigBiomeType(), "")
-            .setNameKey(MOD_ID + ".task.biomes");
-
-        // Dimensions with ConfigDimensionType
-        config.addList("dimensions", dimensions, new ConfigDimensionType(), "")
-            .setNameKey(MOD_ID + ".task.dimensions");
-
-        // PokeBalls with ConfigPokeBallType
-        config.addList("pokeballs", pokeBallsUsed, new ConfigPokeBallType(), "")
-            .setNameKey(MOD_ID + ".task.pokeballs");
-    }
-
-    /**
-     * Adds form/variant filtering fields.
-     * Shown when evolution or form-related actions are selected.
-     */
-    private void addFormFields(ConfigGroup config) {
-        // Forms with ConfigFormType
-        config.addList("forms", forms, new ConfigFormType(), "")
-            .setNameKey(MOD_ID + ".task.forms");
-    }
-
-    /**
-     * Adds gender filtering fields.
-     */
-    private void addGenderFields(ConfigGroup config) {
-        // Genders with ConfigGenderType
-        config.addList("genders", genders, new ConfigGenderType(), "")
-            .setNameKey(MOD_ID + ".task.genders");
-    }
-
-    /**
-     * Adds gimmick-specific condition fields.
-     * Mega Evolution, Terastallization, Z-Moves, Dynamax, etc.
-     */
-    private void addGimmickFields(ConfigGroup config) {
-        if (shouldShowGimmickFields("mega_evolve")) {
-            // Mega forms with ConfigMegaFormType
-            config.addList("mega_forms", megaForms, new ConfigMegaFormType(), "")
-                .setNameKey(MOD_ID + ".task.mega_forms");
-        }
-
-        if (shouldShowGimmickFields("terastallize")) {
-            // Tera types with ConfigTeraType
-            config.addList("tera_types", teraTypes, new ConfigTeraType(), "")
-                .setNameKey(MOD_ID + ".task.tera_types");
-        }
-
-        if (shouldShowGimmickFields("use_z_move")) {
-            // Z-Crystals with ConfigZCrystalType
-            config.addList("z_crystals", zCrystals, new ConfigZCrystalType(), "")
-                .setNameKey(MOD_ID + ".task.z_crystals");
-        }
-
-        if (shouldShowGimmickFields("dynamax") || shouldShowGimmickFields("gigantamax")
-                || shouldShowGimmickFields("ultra_burst")) {
-            // Dynamax types with ConfigDynamaxType
-            config.addList("dynamax_types", dynamaxTypes, new ConfigDynamaxType(), "")
-                .setNameKey(MOD_ID + ".task.dynamax_types");
-        }
+    private boolean hasAnyGimmickAction() {
+        return shouldShowGimmickFields("mega_evolve")
+            || shouldShowGimmickFields("terastallize")
+            || shouldShowGimmickFields("use_z_move")
+            || shouldShowGimmickFields("dynamax")
+            || shouldShowGimmickFields("gigantamax")
+            || shouldShowGimmickFields("ultra_burst");
     }
 
     @Override

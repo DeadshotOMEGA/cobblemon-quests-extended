@@ -31,19 +31,19 @@ public class SelectRegionScreen extends AbstractButtonListScreen {
     private final ConfigCallback callback;
 
     private static final List<String> ALL_REGIONS = List.of(
-            "kanto", "johto", "hoenn", "sinnoh", "unova",
-            "kalos", "alola", "galar", "paldea"
+            "gen1", "gen2", "gen3", "gen4", "gen5",
+            "gen6", "gen7", "gen8", "gen9"
     );
 
     private static final Map<String, Integer> REGION_COLORS = Map.of(
-            "kanto", 0xE74C3C, "johto", 0xF1C40F, "hoenn", 0x27AE60,
-            "sinnoh", 0x3498DB, "unova", 0x2C3E50, "kalos", 0x9B59B6,
-            "alola", 0xF39C12, "galar", 0xE91E63, "paldea", 0x1ABC9C
+            "gen1", 0xE74C3C, "gen2", 0xF1C40F, "gen3", 0x27AE60,
+            "gen4", 0x3498DB, "gen5", 0x2C3E50, "gen6", 0x9B59B6,
+            "gen7", 0xF39C12, "gen8", 0xE91E63, "gen9", 0x1ABC9C
     );
 
     private static final Map<String, Integer> REGION_GENERATIONS = Map.of(
-            "kanto", 1, "johto", 2, "hoenn", 3, "sinnoh", 4,
-            "unova", 5, "kalos", 6, "alola", 7, "galar", 8, "paldea", 9
+            "gen1", 1, "gen2", 2, "gen3", 3, "gen4", 4,
+            "gen5", 5, "gen6", 6, "gen7", 7, "gen8", 8, "gen9", 9
     );
 
     public SelectRegionScreen(ConfigRegionType config, ConfigCallback callback) {
@@ -98,7 +98,7 @@ public class SelectRegionScreen extends AbstractButtonListScreen {
         private final String region;
 
         public RegionButton(Panel panel, String region) {
-            super(panel, Component.translatable("cobblemon_quests_extended.region." + region), Color4I.empty());
+            super(panel, Component.translatable("cobblemon_quests_extended.regions." + region), Color4I.empty());
             this.region = region;
             setHeight(14);
         }
@@ -124,7 +124,7 @@ public class SelectRegionScreen extends AbstractButtonListScreen {
 
         @Override
         public void addMouseOverText(TooltipList list) {
-            list.add(Component.translatable("cobblemon_quests_extended.region." + region)
+            list.add(Component.translatable("cobblemon_quests_extended.regions." + region)
                     .withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD));
             Integer gen = REGION_GENERATIONS.get(region);
             if (gen != null) {

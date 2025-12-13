@@ -8,8 +8,8 @@ This roadmap outlines the phased development plan for enhancing the quest creati
 |-------|------|--------|------|----------|
 | 1 | Foundation | ✅ Complete | LOW | v1.2.0 |
 | 2 | Smart Conditional Fields | ✅ Complete | MODERATE | v1.3.0 |
-| 3 | Domain Model + Validation | ⚠️ Partial | MODERATE | v1.4.0 |
-| 4 | Live Preview + UI Integration | 🔲 Planned | MODERATE | v1.5.0 |
+| 3 | Domain Model + Validation | ✅ Complete | MODERATE | v1.4.0 |
+| 4 | Live Preview + UI Integration | ✅ Complete | MODERATE | v1.5.0 |
 | 5 | Web Editor | 🔲 Planned | HIGH | v2.0.0 |
 | 6 | CLI/API | 🔲 Planned | LOW | v2.1.0 |
 
@@ -145,12 +145,12 @@ public class FieldVisibilityRules {
 
 ---
 
-## Phase 3: Enhanced UI + Domain Model + Validation ⚠️ PARTIAL
+## Phase 3: Enhanced UI + Domain Model + Validation ✅ COMPLETE
 
 **Goal:** Professional UI for all condition fields, clean data separation, validation
 **Risk:** MODERATE
-**Target Version:** 1.4.0
-**Status:** Infrastructure complete, integration pending
+**Version:** 1.4.0
+**Status:** Released 2025-12-13
 
 ### Reference Documents
 
@@ -172,14 +172,14 @@ public class FieldVisibilityRules {
 | **Edit Screen** | `client/gui/CobblemonTaskEditScreen.java` | Validation integration, "Fix Errors" button state |
 | **Logging** | Throughout | Extensive logging for debugging validation flow |
 
-#### ❌ Not Completed (Moved to Phase 4)
+#### ✅ Completed in Phase 4
 
 | Component | Issue | Resolution |
 |-----------|-------|------------|
-| **ConfigValue Integration** | New Config*Type classes not wired to CobblemonTask.fillConfigGroup() | Wire up in Phase 4 |
-| **Selector Screen Usage** | Selector screens exist but never opened (StringConfig still used) | Replace StringConfig with new types |
-| **Validation UI Feedback** | ValidationFeedbackPanel removed due to layout conflicts with EditConfigScreen | Implement in Live Preview panel |
-| **Visual Error Indicators** | "Fix Errors" button blocks save but no visible error list | Show errors in Live Preview |
+| **ConfigValue Integration** | New Config*Type classes wired to CobblemonTask.fillConfigGroup() | ✅ Done |
+| **Selector Screen Usage** | Selector screens now open when clicking fields | ✅ Done |
+| **Validation UI Feedback** | Validation errors/warnings shown in LivePreviewPanel | ✅ Done |
+| **Visual Error Indicators** | Errors and warnings visible in real-time preview | ✅ Done |
 
 ### Files Created
 
@@ -227,53 +227,39 @@ public class FieldVisibilityRules {
 
 ---
 
-## Phase 4: Live Preview + UI Integration 🔲 PLANNED
+## Phase 4: Live Preview + UI Integration ✅ COMPLETE
 
 **Goal:** Natural language preview + complete Phase 3 integration + validation feedback
 **Risk:** MODERATE
-**Target Version:** 1.5.0
+**Version:** 1.5.0
+**Status:** Released 2025-12-13
 
-### Problems
+### Deliverables Completed
 
-1. Quest creators can't see what their quest will require without testing in-game
-2. Phase 3 ConfigValue types and selector screens exist but aren't wired up
-3. Validation errors have no visual feedback (just blocks save)
-4. No way to see validation warnings about unused fields
+#### Part A: Complete Phase 3 Integration ✅
 
-### Deliverables
+1. **ConfigValue types wired to CobblemonTask.fillConfigGroup()**
+   - Replaced `StringConfig` with new `Config*Type` classes
+   - All selector screens now open when clicking fields
 
-#### Part A: Complete Phase 3 Integration
+2. **All 11 selector screens tested and working**
+   - Pokemon (flat alphabetical list), Type, Nature, Biome, Dimension, Region, Gender, MegaForm, Form, TeraType, PokeBall
 
-1. **Wire up ConfigValue types in CobblemonTask.fillConfigGroup()**
-   - Replace `StringConfig` with new `Config*Type` classes
-   - This enables the selector screens to open when clicking fields
-
-   ```java
-   // Before (current)
-   config.addList("pokemon_types", pokemonTypes, new StringConfig(), ...)
-
-   // After
-   config.addList("pokemon_types", pokemonTypes, new ConfigTypeSelector(), ...)
-   ```
-
-2. **Test all 11 selector screens work correctly**
-   - Pokemon, Type, Nature, Biome, Dimension, Region, Gender, MegaForm, Form, TeraType, PokeBall
-
-#### Part B: Validation Feedback Panel
+#### Part B: Validation Feedback Panel ✅
 
 3. **LivePreviewPanel** - Combined preview + validation widget
-   - Shows at top or side of edit screen
-   - Natural language quest summary
-   - Validation errors in red
-   - Validation warnings in yellow
-   - Updates in real-time as fields change
+   - Shows on RIGHT side of edit screen (side-by-side layout)
+   - Real-time validation errors in red
+   - Real-time validation warnings in yellow
+   - Word wrapping for all content sections
+   - Updates as fields change
 
-4. **Integration with CobblemonTaskEditScreen**
-   - Add LivePreviewPanel to screen layout
-   - Pass validation results to panel
-   - Scroll to field when clicking error
+4. **CobblemonTaskEditScreen Integration**
+   - Custom `alignWidgets()` for side-by-side layout
+   - Config panel on left, preview on right
+   - Validation results passed to panel in real-time
 
-#### Part C: Natural Language Preview
+#### Part C: Natural Language Preview ✅
 
 5. **NaturalLanguageGenerator** - Converts task model → English
    - Human-readable quest requirement description
@@ -281,79 +267,29 @@ public class FieldVisibilityRules {
    - Handles pluralization and grammar
    - Shows active conditions only
 
-### Technical Design
+### Files Created
 
-```java
-// LivePreviewPanel structure
-public class LivePreviewPanel extends Panel {
-    private final CobblemonTask task;
-    private final TaskValidator validator;
-    private final NaturalLanguageGenerator nlg;
+**Preview System (`preview/`):**
+- `NaturalLanguageGenerator.java` - Text generation engine with action-specific formatting
+- `LivePreviewPanel.java` - Combined preview + validation widget with word wrap
+- `ConditionFormatter.java` - Format individual conditions for display
 
-    // Sections:
-    // 1. Quest Summary (natural language)
-    // 2. Validation Errors (if any)
-    // 3. Validation Warnings (if any)
-    // 4. Active Conditions list
+**Registry (`registry/`):**
+- `PokemonListCategory.java` - Simple single-category enum for flat Pokemon list
 
-    public void refresh() {
-        CobblemonTaskModel model = CobblemonTaskModel.fromTask(task);
-        ValidationResult result = validator.validate(model);
-        String preview = nlg.generate(model);
-        // Update UI...
-    }
-}
-```
+### Files Modified
 
-### Files
+- `tasks/CobblemonTask.java` - Replaced StringConfig with Config*Type classes
+- `client/gui/CobblemonTaskEditScreen.java` - Side-by-side layout with LivePreviewPanel
+- `client/gui/selectors/SelectPokemonScreen.java` - Simplified to flat alphabetical list
+- `lang/en_us.json` - Added preview translation keys
 
-**New:**
-- `preview/NaturalLanguageGenerator.java` - Text generation engine
-- `preview/LivePreviewPanel.java` - Combined preview + validation widget
-- `preview/ConditionFormatter.java` - Format individual conditions
+### UI Improvements
 
-**Modified:**
-- `tasks/CobblemonTask.java` - Replace StringConfig with Config*Type classes
-- `client/gui/CobblemonTaskEditScreen.java` - Add LivePreviewPanel integration
-
-### Example Output
-
-```
-┌─────────────────────────────────────────────┐
-│ Quest Preview                               │
-├─────────────────────────────────────────────┤
-│ "Catch 5 shiny Pikachu or Raichu using a   │
-│  Premier Ball in the Plains biome during    │
-│  daytime."                                  │
-├─────────────────────────────────────────────┤
-│ ❌ ERRORS                                   │
-│ • [actions] At least one action required    │
-├─────────────────────────────────────────────┤
-│ ⚠️ WARNINGS                                 │
-│ • [biomes] Biomes filter unused for this    │
-│   action                                    │
-├─────────────────────────────────────────────┤
-│ Active Conditions:                          │
-│ • Species: Pikachu, Raichu                  │
-│ • Shiny: Yes                                │
-│ • Ball: Premier Ball                        │
-│ • Biome: Plains                             │
-│ • Time: Day (0-12000)                       │
-└─────────────────────────────────────────────┘
-```
-
-### Execution Plan
-
-| Tier | Task | Agent | Purpose |
-|------|------|-------|---------|
-| T0 | Git Setup | `git-flow-manager` | Create feature/live-preview branch |
-| T1 | Explore | `Explore` | Review Phase 3 files, understand integration points |
-| T2 | Planning | `Plan` | Create detailed implementation plan |
-| T3a | Integration | `programmer` | Wire ConfigValue types to CobblemonTask |
-| T3b | NLG | `programmer` | Implement NaturalLanguageGenerator |
-| T3c | Panel | `programmer` | Implement LivePreviewPanel |
-| T4 | Testing | Manual | Test all selectors and preview |
-| T5 | Review | `code-reviewer` | Review implementation |
+- **Collapsible config groups** - Action, Pokemon, Level, Location, Capture, Pokedex, Gimmicks
+- **Side-by-side layout** - Config fields on left, live preview on right
+- **Word wrapping** - All preview panel sections wrap text properly
+- **Flat Pokemon list** - Removed generation grouping, pure alphabetical
 
 ---
 

@@ -46,8 +46,8 @@ public class CobblemonTaskGuiProvider {
      * @param callback Called when configuration is complete (null for edit mode)
      */
     public static void openConfigScreen(Runnable gui, CobblemonTask task, BiConsumer<Task, CompoundTag> callback) {
-        // Create config group
-        ConfigGroup group = new ConfigGroup(MOD_ID, accepted -> {
+        // Create config group with short id to keep breadcrumbs short
+        ConfigGroup group = new ConfigGroup("task", accepted -> {
             if (!accepted) {
                 gui.run();
                 return;
@@ -63,10 +63,15 @@ public class CobblemonTaskGuiProvider {
             public Component getName() {
                 return Component.translatable(MOD_ID + ".task.title");
             }
+
+            @Override
+            public String getNameKey() {
+                return MOD_ID + ".config.root";
+            }
         };
 
-        // Populate config fields using Phase 2 conditional logic
-        task.fillConfigGroup(task.createSubGroup(group));
+        // Populate config fields directly (skip createSubGroup to avoid deep breadcrumb nesting)
+        task.fillConfigGroup(group);
 
         // Open custom edit screen with dynamic button behavior
         // When actions change, "Accept" becomes "Update Fields" and reopens the screen
