@@ -145,44 +145,77 @@ public class FieldVisibilityRules {
 
 ---
 
-## Phase 3: Domain Model + Validation 🔲 PLANNED
+## Phase 3: Enhanced UI + Domain Model + Validation 🔲 PLANNED
 
-**Goal:** Clean separation between UI and data, enable validation
+**Goal:** Professional UI for all condition fields, clean data separation, validation
 **Risk:** MODERATE
 **Target Version:** 1.4.0
 
-### Problem
+### Problems
 
-Currently, quest data is tightly coupled to FTB Library's ConfigGroup. This makes:
-- Validation difficult (incompatible combinations aren't caught)
-- Testing difficult (need full GUI to test logic)
-- Reuse difficult (can't use task logic outside FTB Quests)
+1. **Inconsistent UI**: Actions have a beautiful categorized picker with tooltips, but all other list fields (Pokemon, Types, Biomes, etc.) still use basic FTB Library list editors
+2. **Poor organization**: The conditionals screen shows all fields in a flat list without logical grouping
+3. **No tooltips**: Condition fields lack helpful descriptions explaining what they do
+4. **Tight coupling**: Quest data is coupled to FTB Library's ConfigGroup, making validation and testing difficult
 
 ### Deliverables
 
-1. **CobblemonTaskModel** - Domain object (not UI-coupled)
+#### UI Enhancement
+
+1. **Redesigned Conditionals Screen**
+   - Organized field groups with collapsible sections
+   - Logical grouping: Pokemon Filters, Location Filters, Battle Gimmicks, etc.
+   - Tooltips on every field explaining its purpose and valid values
+   - Visual hierarchy matching the Action Picker quality
+
+2. **Enhanced List Selectors** - Apply Action Picker pattern to all lists:
+   - **Pokemon Selector**: Categorized by generation/type, search, sprites
+   - **Type Selector**: All 18 types with color coding and icons
+   - **Biome Selector**: Categorized biomes with descriptions
+   - **Dimension Selector**: Available dimensions with icons
+   - **Region Selector**: Cobblemon regions (Kanto, Johto, etc.)
+   - **Nature Selector**: All 25 natures with stat effects shown
+   - **PokeBall Selector**: All balls with sprites and descriptions
+   - **Gender Selector**: Male/Female/Genderless with icons
+   - **Tera Type Selector**: Types with tera crystal styling
+   - **Mega Form Selector**: Mega/Mega-X/Mega-Y/Primal options
+   - **Form Selector**: Species-specific forms with previews
+
+#### Domain Model
+
+3. **CobblemonTaskModel** - Domain object (not UI-coupled)
    - Pure data class with typed fields
    - No dependency on FTB Library or Minecraft
    - Builder pattern for construction
 
-2. **TaskValidator** - Validate incompatible combinations
+4. **TaskValidator** - Validate incompatible combinations
    - Check action + condition compatibility
    - Validate required fields for specific actions
    - Return user-friendly error messages
 
-3. **TaskModelSerializer** - Convert model ↔ NBT
+5. **TaskModelSerializer** - Convert model ↔ NBT
    - Serialize model to NBT for storage
    - Deserialize NBT to model
    - Handle version migrations
 
-4. **Validation feedback in GUI**
+6. **Validation feedback in GUI**
    - Real-time validation as fields change
    - Error indicators on invalid fields
    - Tooltip with validation error message
 
 ### Files
 
-**New:**
+**New (UI):**
+- `client/gui/CobblemonTaskScreen.java` - Redesigned main config screen
+- `client/gui/selectors/SelectPokemonScreen.java` - Pokemon picker
+- `client/gui/selectors/SelectTypeScreen.java` - Type picker
+- `client/gui/selectors/SelectBiomeScreen.java` - Biome picker
+- `client/gui/selectors/SelectNatureScreen.java` - Nature picker
+- `client/gui/selectors/SelectPokeBallScreen.java` - PokeBall picker
+- `client/gui/selectors/SelectFormScreen.java` - Form picker
+- `client/config/Config*Type.java` - Custom ConfigValue types for each selector
+
+**New (Domain):**
 - `model/CobblemonTaskModel.java` - Domain model
 - `model/CobblemonTaskModelBuilder.java` - Builder for model
 - `validation/TaskValidator.java` - Validation logic
@@ -191,8 +224,9 @@ Currently, quest data is tightly coupled to FTB Library's ConfigGroup. This make
 - `client/gui/ValidationFeedback.java` - GUI validation indicators
 
 **Modified:**
-- `tasks/CobblemonTask.java` - Use model internally
+- `tasks/CobblemonTask.java` - Use model internally, new config types
 - `client/config/ConfigActionType.java` - Show validation errors
+- `lang/en_us.json` - Tooltips and descriptions for all fields
 
 ### Validation Rules Examples
 
