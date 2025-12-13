@@ -106,7 +106,7 @@ modrinth {
     projectId.set(System.getenv("MODRINTH_PROJECT_ID") ?: "")
 
     // Version configuration
-    versionNumber.set("${project.version}-neoforge")
+    versionNumber.set("${project.version}")
     // Version name is set via -Pmodrinth.versionName in CI, fallback for local builds
     versionName.set(project.findProperty("modrinth.versionName")?.toString()
         ?: "v${project.version} (NeoForge ${project.property("minecraft_version")})")
