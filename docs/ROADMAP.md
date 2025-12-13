@@ -169,7 +169,7 @@ public class FieldVisibilityRules {
    - Visual hierarchy matching the Action Picker quality
 
 2. **Enhanced List Selectors** - Apply Action Picker pattern to all lists:
-   - **Pokemon Selector**: Categorized by generation/type, search, sprites
+   - **Pokemon Selector**: Categorized by generation/type, search, sprites, sort options (Alphabetical / Pokédex Number)
    - **Type Selector**: All 18 types with color coding and icons
    - **Biome Selector**: Categorized biomes with descriptions
    - **Dimension Selector**: Available dimensions with icons
