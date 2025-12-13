@@ -12,6 +12,7 @@ import com.cobblemon.mod.common.item.components.PokemonItemComponent;
 import com.cobblemon.mod.common.pokemon.Nature;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.cobblemon.mod.common.pokemon.Species;
+import cobblemonquestsextended.cobblemon_quests_extended.client.config.ConfigActionType;
 import dev.ftb.mods.ftblibrary.config.ConfigGroup;
 import dev.ftb.mods.ftblibrary.config.EnumConfig;
 import dev.ftb.mods.ftblibrary.config.NameMap;
@@ -236,8 +237,8 @@ public class CobblemonTask extends Task {
         // Asserts that the client is in a world, something that always should be true when the config is opened.
         assert Minecraft.getInstance().level != null;
         RegistryAccess registryManager = Minecraft.getInstance().level.registryAccess();
-        // Use StringConfig - EnumConfig doesn't work with addList (upstream bug)
-        config.addList("actions", actions, new StringConfig(), "catch").setNameKey(MOD_ID + ".task.actions");
+        // Use ConfigActionType for rich action selection UI with categories and tooltips
+        config.addList("actions", actions, new ConfigActionType(), "catch").setNameKey(MOD_ID + ".task.actions");
         Function<String, String> pokemonNameProcessor = (name) -> name.replace(":", ".species.") + ".name";
         List<String> pokemonList = PokemonSpecies.getSpecies().stream().map(species -> species.resourceIdentifier.toString())
                 .sorted().collect(Collectors.toCollection(() -> new ArrayList<>(PokemonSpecies.getSpecies().size() + 1)));

@@ -1,5 +1,6 @@
 {
   "ftbquests.task.cobblemon_tasks.cobblemon_task": "Cobblemon Task",
+
   "cobblemon_quests_extended.task.actions": "Actions",
   "cobblemon_quests_extended.task.pokemons": "Pokémon",
   "cobblemon_quests_extended.task.amount": "Amount",
@@ -21,6 +22,7 @@
   "cobblemon_quests_extended.task.mega_forms": "Mega Forms",
   "cobblemon_quests_extended.task.z_crystals": "Z-Crystals",
   "cobblemon_quests_extended.task.dynamax_types": "Dynamax Types",
+
   "cobblemon_quests_extended.task.actions.tooltip": "The actions the player must perform to complete the task.",
   "cobblemon_quests_extended.task.pokemons.tooltip": "The possible Pokémon the player can interact with to complete the task. If the list is empty, any Pokémon counts towards the task.",
   "cobblemon_quests_extended.task.amount.tooltip": "The amount of Pokémon.",
@@ -37,43 +39,158 @@
   "cobblemon_quests_extended.task.min_level.tooltip": "The minimum level of the Pokémon. (inclusive)",
   "cobblemon_quests_extended.task.max_level.tooltip": "The maximum level of the Pokémon. (inclusive)",
   "cobblemon_quests_extended.task.dex_progress.tooltip": "The Poké Dex progress the player must have to complete the task.\nOnly applicable to the `register` and `have_registered` actions.",
-    "cobblemon_quests_extended.task.natures.tooltip": "The allowed natures of the Pokémon (Adamant, Modest, etc.)",
+  "cobblemon_quests_extended.task.natures.tooltip": "The allowed natures of the Pokémon (Adamant, Modest, etc.)",
+
+  "cobblemon_quests_extended.category.catch": "Obtaining Pokémon",
+  "cobblemon_quests_extended.category.battle": "Battle",
+  "cobblemon_quests_extended.category.evolution": "Evolution",
+  "cobblemon_quests_extended.category.trade": "Trading",
+  "cobblemon_quests_extended.category.pokedex": "Pokédex",
+  "cobblemon_quests_extended.category.gimmick": "Battle Gimmicks",
+  "cobblemon_quests_extended.category.other": "Other",
+
+  "cobblemon_quests_extended.gui.select_action": "Select Action",
+  "cobblemon_quests_extended.gui.action.requires_pokemon": "Requires Pokémon: %s",
+  "cobblemon_quests_extended.gui.action.category": "Category: %s",
+  "cobblemon_quests_extended.gui.action_count": "%d actions",
+  "cobblemon_quests_extended.gui.click_to_toggle": "Click to expand/collapse",
+  "cobblemon_quests_extended.config.category": "Category",
+  "cobblemon_quests_extended.config.requires_pokemon": "Requires Pokémon",
+
   "cobblemon_quests_extended.actions.catch": "Catch",
+  "cobblemon_quests_extended.actions.catch.desc": "Triggers when successfully catching a wild Pokémon with a Poké Ball.",
+  "cobblemon_quests_extended.actions.catch.example": "Example: Catch 5 Bulbasaur in a Forest biome",
+
   "cobblemon_quests_extended.actions.defeat": "Defeat",
+  "cobblemon_quests_extended.actions.defeat.desc": "Triggers when defeating a wild Pokémon in battle.",
+  "cobblemon_quests_extended.actions.defeat.example": "Example: Defeat 10 Fire-type Pokémon",
+
   "cobblemon_quests_extended.actions.defeat_player": "Defeat player",
+  "cobblemon_quests_extended.actions.defeat_player.desc": "Triggers when defeating another player's Pokémon in battle.",
+  "cobblemon_quests_extended.actions.defeat_player.example": "Example: Win 3 PvP battles",
+
   "cobblemon_quests_extended.actions.defeat_npc": "Defeat NPC",
+  "cobblemon_quests_extended.actions.defeat_npc.desc": "Triggers when defeating an NPC trainer's Pokémon.",
+  "cobblemon_quests_extended.actions.defeat_npc.example": "Example: Defeat 5 trainer Pokémon",
+
   "cobblemon_quests_extended.actions.kill": "Kill",
+  "cobblemon_quests_extended.actions.kill.desc": "Triggers when a Pokémon is killed (not fainted) in battle.",
+  "cobblemon_quests_extended.actions.kill.example": "Example: Kill 3 Ghost-type Pokémon",
+
   "cobblemon_quests_extended.actions.evolve": "Evolve",
+  "cobblemon_quests_extended.actions.evolve.desc": "Triggers when your Pokémon evolves. Counts the pre-evolution form.",
+  "cobblemon_quests_extended.actions.evolve.example": "Example: Evolve 2 Eevee",
+
   "cobblemon_quests_extended.actions.evolve_into": "Evolve into",
+  "cobblemon_quests_extended.actions.evolve_into.desc": "Triggers when a Pokémon evolves into a specific form. Counts the evolved form.",
+  "cobblemon_quests_extended.actions.evolve_into.example": "Example: Evolve into Charizard",
+
   "cobblemon_quests_extended.actions.level_up": "Level up",
-  "cobblemon_quests_extended.actions.release": "Release",
-  "cobblemon_quests_extended.actions.trade_away": "Trade away",
-  "cobblemon_quests_extended.actions.trade_for": "Trade for",
-  "cobblemon_quests_extended.actions.obtain": "Obtain",
+  "cobblemon_quests_extended.actions.level_up.desc": "Triggers on each level gained. Leveling from 10→13 adds 3 progress.",
+  "cobblemon_quests_extended.actions.level_up.example": "Example: Gain 20 total levels",
+
   "cobblemon_quests_extended.actions.level_up_to": "Level up to",
-  "cobblemon_quests_extended.actions.scan": "Scan",
-  "cobblemon_quests_extended.actions.reel": "Reel",
+  "cobblemon_quests_extended.actions.level_up_to.desc": "Tracks the Pokémon's current level. Leveling to 13 sets progress to 13.",
+  "cobblemon_quests_extended.actions.level_up_to.example": "Example: Level a Pokémon to 50",
+
+  "cobblemon_quests_extended.actions.release": "Release",
+  "cobblemon_quests_extended.actions.release.desc": "Triggers when releasing a Pokémon from your PC.",
+  "cobblemon_quests_extended.actions.release.example": "Example: Release 5 Pokémon",
+
   "cobblemon_quests_extended.actions.throw_ball": "Throw pokéball",
+  "cobblemon_quests_extended.actions.throw_ball.desc": "Triggers when throwing a Poké Ball at a Pokémon (hit or miss).",
+  "cobblemon_quests_extended.actions.throw_ball.example": "Example: Throw 10 Great Balls",
+
+  "cobblemon_quests_extended.actions.trade_away": "Trade away",
+  "cobblemon_quests_extended.actions.trade_away.desc": "Triggers when trading a Pokémon to another player.",
+  "cobblemon_quests_extended.actions.trade_away.example": "Example: Trade away 3 Pokémon",
+
+  "cobblemon_quests_extended.actions.trade_for": "Trade for",
+  "cobblemon_quests_extended.actions.trade_for.desc": "Triggers when receiving a Pokémon in a trade.",
+  "cobblemon_quests_extended.actions.trade_for.example": "Example: Receive 2 Pokémon in trades",
+
+  "cobblemon_quests_extended.actions.obtain": "Obtain",
+  "cobblemon_quests_extended.actions.obtain.desc": "Triggers on catch, trade_for, or revive_fossil. Any way of obtaining a Pokémon.",
+  "cobblemon_quests_extended.actions.obtain.example": "Example: Obtain 10 Water-type Pokémon",
+
   "cobblemon_quests_extended.actions.select_starter": "Select starter",
+  "cobblemon_quests_extended.actions.select_starter.desc": "Triggers when selecting your starter Pokémon.",
+  "cobblemon_quests_extended.actions.select_starter.example": "Example: Choose your first Pokémon",
+
   "cobblemon_quests_extended.actions.revive_fossil": "Revive fossil",
+  "cobblemon_quests_extended.actions.revive_fossil.desc": "Triggers when reviving a Pokémon from a fossil.",
+  "cobblemon_quests_extended.actions.revive_fossil.example": "Example: Revive an Aerodactyl from fossil",
+
+  "cobblemon_quests_extended.actions.scan": "Scan",
+  "cobblemon_quests_extended.actions.scan.desc": "Triggers when scanning a Pokémon with the Pokédex.",
+  "cobblemon_quests_extended.actions.scan.example": "Example: Scan 25 different Pokémon",
+
+  "cobblemon_quests_extended.actions.reel": "Reel",
+  "cobblemon_quests_extended.actions.reel.desc": "Triggers when reeling in a Pokémon while fishing.",
+  "cobblemon_quests_extended.actions.reel.example": "Example: Fish up 5 Magikarp",
+
   "cobblemon_quests_extended.actions.register": "Register",
+  "cobblemon_quests_extended.actions.register.desc": "Triggers when a new Pokémon is registered to your Pokédex.",
+  "cobblemon_quests_extended.actions.register.example": "Example: Register 50 Pokémon to Pokédex",
+
   "cobblemon_quests_extended.actions.have_registered": "Have registered",
+  "cobblemon_quests_extended.actions.have_registered.desc": "Checks Pokédex completion on login. Use with dex_progress condition.",
+  "cobblemon_quests_extended.actions.have_registered.example": "Example: Have 100 Pokémon registered as caught",
+
   "cobblemon_quests_extended.actions.mega_evolve": "Mega Evolve",
+  "cobblemon_quests_extended.actions.mega_evolve.desc": "Triggers when Mega Evolving a Pokémon in battle.",
+  "cobblemon_quests_extended.actions.mega_evolve.example": "Example: Mega Evolve Charizard into Mega Charizard X",
+
   "cobblemon_quests_extended.actions.terastallize": "Terastallize",
+  "cobblemon_quests_extended.actions.terastallize.desc": "Triggers when Terastallizing a Pokémon in battle.",
+  "cobblemon_quests_extended.actions.terastallize.example": "Example: Terastallize 5 Pokémon with Fire Tera type",
+
   "cobblemon_quests_extended.actions.use_z_move": "Use Z-Move",
+  "cobblemon_quests_extended.actions.use_z_move.desc": "Triggers when using a Z-Move in battle.",
+  "cobblemon_quests_extended.actions.use_z_move.example": "Example: Use Pikachu's exclusive Z-Move",
+
   "cobblemon_quests_extended.actions.dynamax": "Dynamax",
+  "cobblemon_quests_extended.actions.dynamax.desc": "Triggers when Dynamaxing a Pokémon in battle. Requires Mega Showdown mod.",
+  "cobblemon_quests_extended.actions.dynamax.example": "Example: Dynamax 3 Pokémon in Max Raid battles",
+
   "cobblemon_quests_extended.actions.gigantamax": "Gigantamax",
+  "cobblemon_quests_extended.actions.gigantamax.desc": "Triggers when Gigantamaxing a Pokémon in battle. Requires Mega Showdown mod.",
+  "cobblemon_quests_extended.actions.gigantamax.example": "Example: Gigantamax Pikachu",
+
   "cobblemon_quests_extended.actions.ultra_burst": "Ultra Burst",
+  "cobblemon_quests_extended.actions.ultra_burst.desc": "Triggers when Necrozma uses Ultra Burst. Requires Mega Showdown mod.",
+  "cobblemon_quests_extended.actions.ultra_burst.example": "Example: Use Ultra Burst with Necrozma",
+
   "cobblemon_quests_extended.actions.change_form": "Change Form",
+  "cobblemon_quests_extended.actions.change_form.desc": "Triggers when a Pokémon changes form during battle.",
+  "cobblemon_quests_extended.actions.change_form.example": "Example: Change Aegislash to Blade Forme",
+
   "cobblemon_quests_extended.actions.faint_pokemon": "Faint Pokémon",
+  "cobblemon_quests_extended.actions.faint_pokemon.desc": "Triggers when your Pokémon causes an opponent to faint.",
+  "cobblemon_quests_extended.actions.faint_pokemon.example": "Example: Faint 20 opponent Pokémon",
+
   "cobblemon_quests_extended.actions.send_out": "Send Out",
+  "cobblemon_quests_extended.actions.send_out.desc": "Triggers when sending a Pokémon into battle.",
+  "cobblemon_quests_extended.actions.send_out.example": "Example: Send out Pikachu 10 times",
+
   "cobblemon_quests_extended.actions.give_held_item": "Give Held Item",
+  "cobblemon_quests_extended.actions.give_held_item.desc": "Triggers when giving a held item to a Pokémon.",
+  "cobblemon_quests_extended.actions.give_held_item.example": "Example: Give 5 Pokémon held items",
+
   "cobblemon_quests_extended.actions.heal": "Heal",
+  "cobblemon_quests_extended.actions.heal.desc": "Triggers when healing a Pokémon.",
+  "cobblemon_quests_extended.actions.heal.example": "Example: Heal your Pokémon 10 times",
+
   "cobblemon_quests_extended.actions.hatch_egg": "Hatch Egg",
+  "cobblemon_quests_extended.actions.hatch_egg.desc": "Triggers when a Pokémon egg hatches.",
+  "cobblemon_quests_extended.actions.hatch_egg.example": "Example: Hatch 3 eggs",
+
   "cobblemon_quests_extended.actions.": "",
+
   "cobblemon_quests_extended.genders.genderless": "Genderless",
   "cobblemon_quests_extended.genders.male": "Male",
   "cobblemon_quests_extended.genders.female": "Female",
+
   "cobblemon_quests_extended.forms.normal": "Normal",
   "cobblemon_quests_extended.forms.alolan": "Alolan",
   "cobblemon_quests_extended.forms.galarian": "Galarian",
@@ -110,6 +227,8 @@
   "cobblemon_quests_extended.forms.magikarp-jump-skelly": "Skelly (magikarp jump)",
   "cobblemon_quests_extended.forms.magikarp-jump-violet-raindrops": "Violet Raindrops (magikarp jump)",
   "cobblemon_quests_extended.forms.magikarp-jump-violet-saucy": "Violet Saucy (magikarp jump)",
+  "cobblemon_quests_extended.forms.": "",
+
   "cobblemon_quests_extended.regions.gen1": "Kanto",
   "cobblemon_quests_extended.regions.gen2": "Johto",
   "cobblemon_quests_extended.regions.gen3": "Hoenn",
@@ -119,14 +238,17 @@
   "cobblemon_quests_extended.regions.gen7": "Alola",
   "cobblemon_quests_extended.regions.gen8": "Galar",
   "cobblemon_quests_extended.regions.gen9": "Paldea",
+
   "cobblemon_quests_extended.mega_forms.mega": "Mega",
   "cobblemon_quests_extended.mega_forms.mega-x": "Mega X",
   "cobblemon_quests_extended.mega_forms.mega-y": "Mega Y",
   "cobblemon_quests_extended.mega_forms.primal": "Primal",
   "cobblemon_quests_extended.mega_forms.": "",
+
   "cobblemon_quests_extended.dynamax_types.dynamax": "Dynamax",
   "cobblemon_quests_extended.dynamax_types.gigantamax": "Gigantamax",
   "cobblemon_quests_extended.dynamax_types.": "",
+
   "cobblemon_quests_extended.z_crystals.normalium-z": "Normalium Z",
   "cobblemon_quests_extended.z_crystals.firium-z": "Firium Z",
   "cobblemon_quests_extended.z_crystals.waterium-z": "Waterium Z",
@@ -163,9 +285,10 @@
   "cobblemon_quests_extended.z_crystals.tapunium-z": "Tapunium Z",
   "cobblemon_quests_extended.z_crystals.ultranecrozium-z": "Ultranecrozium Z",
   "cobblemon_quests_extended.z_crystals.": "",
+
   "cobblemon_quests_extended.dex_progress.seen": "Seen",
   "cobblemon_quests_extended.dex_progress.caught": "Caught",
-  "cobblemon_quests_extended.forms.": "",
+
   "cobblemon_quests_extended.name": "",
   "cobblemon.type.": "",
   "item.cobblemon_quests_extended": ""
