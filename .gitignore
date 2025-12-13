@@ -26,3 +26,4 @@ runs/
 
 # Local overrides
 *.local.*
+agent-responses/
