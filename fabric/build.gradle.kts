@@ -96,8 +96,8 @@ modrinth {
     projectId.set(System.getenv("MODRINTH_PROJECT_ID") ?: "")
 
     // Version configuration
-    versionNumber.set("${project.version}")
-    versionName.set("[Fabric ${project.property("minecraft_version")}] ${project.version}")
+    versionNumber.set("${project.version}-fabric")
+    versionName.set("v${project.version} (Fabric ${project.property("minecraft_version")})")
 
     // Release channel from environment or default to release
     versionType.set(System.getenv("RELEASE_CHANNEL") ?: "release")
