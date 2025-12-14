@@ -10,7 +10,7 @@
   "icon": "${mod_icon}",
   "environment": "${environment}",
   "entrypoints": {
-    "main": ["cobblemonquestsextended.cobblemon_quests_extended_extended.fabric.Cobblemon_QuestsFabric"]
+    "main": ["cobblemonquestsextended.cobblemon_quests_extended.fabric.Cobblemon_QuestsFabric"]
   },
   "depends": {
     "fabricloader": "*",
