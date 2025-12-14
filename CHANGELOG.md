@@ -5,6 +5,39 @@ All notable changes to Cobblemon Quests Extended will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2025-12-13
+
+### Added
+- **Live Preview Panel**: Real-time quest preview alongside config fields
+  - Side-by-side layout with config on left, preview on right
+  - Validation errors displayed in red with word wrapping
+  - Validation warnings displayed in yellow
+  - Updates automatically as you edit fields
+- **Natural Language Generator**: Human-readable quest descriptions
+  - Converts task configuration to plain English
+  - Supports all 28 actions and 19 condition fields
+  - Smart pluralization and grammar handling
+  - Shows only active conditions
+- **Enhanced Selector Screens**: All 11 custom selector screens fully integrated
+  - Pokemon, Type, Nature, Biome, Dimension, Region, Gender, MegaForm, Form, TeraType, PokeBall
+  - Rich category organization and color coding
+  - Search filtering support
+- **Collapsible Config Groups**: Organized field sections
+  - Action, Pokemon, Level, Location, Capture, Pokedex, Gimmicks groups
+  - Cleaner navigation through configuration options
+
+### Changed
+- Pokemon selector now displays flat alphabetical list (removed generation grouping)
+- Improved name formatting for Pokemon with special characters (Mr. Mime, Ho-Oh, etc.)
+- Config fields now use custom ConfigValue types with specialized selectors
+
+### Technical
+- Phase 4 implementation of the Quest Visual Designer roadmap
+- `LivePreviewPanel` with custom layout management
+- `NaturalLanguageGenerator` for quest text generation
+- `ConditionFormatter` for individual condition display
+- Custom `alignWidgets()` override for side-by-side screen layout
+
 ## [1.3.0] - 2025-12-13
 
 ### Added
@@ -66,7 +99,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for Z-move quest tasks
 - Comprehensive quest creation documentation
 
-[1.3.0]: https://github.com/yourusername/cobblemon_quests_extended/compare/v1.2.0...v1.3.0
-[1.2.0]: https://github.com/yourusername/cobblemon_quests_extended/compare/v1.1.0...v1.2.0
-[1.1.0]: https://github.com/yourusername/cobblemon_quests_extended/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/yourusername/cobblemon_quests_extended/releases/tag/v1.0.0
+[1.5.0]: https://github.com/DeadshotOMEGA/cobblemon-quests-extended/compare/v1.3.0...v1.5.0
+[1.3.0]: https://github.com/DeadshotOMEGA/cobblemon-quests-extended/compare/v1.2.0...v1.3.0
+[1.2.0]: https://github.com/DeadshotOMEGA/cobblemon-quests-extended/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/DeadshotOMEGA/cobblemon-quests-extended/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/DeadshotOMEGA/cobblemon-quests-extended/releases/tag/v1.0.0
